@@ -29,8 +29,7 @@ export default class Player extends EventEmitter {
     )
 
     const p = new Player(url)
-    const { groups } = await p.getZoneGroupState()
-    return { groups }
+    return p.getZoneGroupState()
   }
 
   constructor (url) {

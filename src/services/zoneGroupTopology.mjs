@@ -31,23 +31,21 @@ function parseZoneGroupTopology (p, Player) {
   // embedded XML
   if (p.isText) p = Parsley.from(p.text)
 
-  const groups = []
+  const players = []
 
   for (const zg of p.findAll('ZoneGroup')) {
-    const leaderUuid = zg.attr.Coordinator
-    let leader
-    const members = []
+    const ldrUuid = zg.attr.Coordinator
 
     for (const zgm of zg.findAll('ZoneGroupMember')) {
       if (+zgm.attr.Invisible) continue
-      const url = new URL('/', zgm.attr.Location)
-      const uuid = zgm.attr.UUID
-      const player = new Player(url)
-      members.push(player)
-      if (uuid === leaderUuid) leader = player
+      const player = {
+        url: new URL('/', zgm.attr.Location).href,
+        uuid: zgm.attr.UUID,
+        fullName: zgm.attr.ZoneName
+      }
+      player.leaderUuid = ldrUuid === player.uuid ? '' : ldrUuid
+      players.push(player)
     }
-
-    if (leader) groups.push({ leader, members })
   }
-  return { groups }
+  return { players }
 }
