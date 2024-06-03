@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "API access to my sonos",
   "type": "module",
-  "exports": "./src/index.js",
+  "exports": "./src/player.mjs",
   "scripts": {
     "clean": "rm -rf coverage/ node_modules/.cache/",
     "format": "prettier-standard '{src,test}/**/*.mjs'",

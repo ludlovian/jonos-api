@@ -9,15 +9,29 @@ import config from './config.mjs'
 import AVTransport from './services/avTransport.mjs'
 import RenderingControl from './services/renderingControl.mjs'
 import ZoneGroupTopology from './services/zoneGroupTopology.mjs'
+import ContentDirectory from './services/contentDirectory.mjs'
 import Listener from './services/listener.mjs'
+import Discovery from './services/discovery.mjs'
 
 export default class Player extends EventEmitter {
   static #playersByUrl = {}
   static listener = new Listener()
+  static #discovery = new Discovery()
 
   #url
   #serial = createSerial()
-  services = {}
+  #services
+
+  static async discover () {
+    const url = await timeout(
+      this.#discovery.discoverOne(),
+      config.apiDiscoveryTimeout
+    )
+
+    const p = new Player(url)
+    const { groups } = await p.getZoneGroupState()
+    return { groups }
+  }
 
   constructor (url) {
     url = new URL(url)
@@ -27,14 +41,16 @@ export default class Player extends EventEmitter {
     super()
     this.#url = url
     Player.#playersByUrl[url.href] = this
-
-    ZoneGroupTopology.register(this)
-    AVTransport.register(this)
-    RenderingControl.register(this)
+    this.#services = [
+      new ZoneGroupTopology(this),
+      new AVTransport(this),
+      new RenderingControl(this),
+      new ContentDirectory(this)
+    ]
   }
 
   [util.inspect.custom] () {
-    return `Player { ${this.url.hostname} }`
+    return `Player { ${this.url.href} }`
   }
 
   get listener () {
@@ -63,5 +79,19 @@ export default class Player extends EventEmitter {
         ?.get('UDN')
         ?.text?.replace('uuid:', '')
     }
+  }
+
+  startListening () {
+    const startService = async svc => this.listener.register(svc)
+    const forwardError = err => this.emit('error', err)
+
+    return Promise.all(this.#services.map(startService)).catch(forwardError)
+  }
+
+  stopListening () {
+    const stopService = async svc => this.listener.unregister(svc)
+    const forwardError = err => this.emit('error', err)
+
+    return Promise.all(this.#services.map(stopService)).catch(forwardError)
   }
 }

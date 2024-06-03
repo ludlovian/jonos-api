@@ -15,10 +15,10 @@ export default class Listener {
   #server
   #url
   #debug = Debug('jonos-api:listener')
-  #pathToSub = {} // map by path
+  #pathToSub = new Map() // map by path
 
   get #allSubs () {
-    return values(this.#pathToSub)
+    return [...this.#pathToSub.values()]
   }
 
   get url () {
@@ -26,7 +26,7 @@ export default class Listener {
   }
 
   hasService (srv) {
-    return this.#allSubs.some(s => s.name === srv.name)
+    return this.#allSubs.some(sub => sub.service.name === srv.name)
   }
 
   async start () {
@@ -35,6 +35,7 @@ export default class Listener {
     const address = getMyAddress()
 
     this.#server = createServer(this.handleRequest.bind(this))
+
     return new Promise((resolve, reject) => {
       this.#server.once('error', reject)
       this.#server.listen(0, address, () => {
@@ -48,8 +49,9 @@ export default class Listener {
 
   async stop () {
     if (!this.#started) return
+    this.#started = false
     const allSubs = [...this.#allSubs]
-    this.#pathToSub = {}
+    this.#pathToSub.clear()
     this.#server.close()
 
     await Promise.all(allSubs.map(sub => sub.unsubscribe()))
@@ -62,13 +64,21 @@ export default class Listener {
 
     const sub = new Subscription(this, service)
     const path = sub.path
-    this.#pathToSub[path] = sub
+    this.#pathToSub.set(path, sub)
     await sub.subscribe()
     this.#debug('%s registered', path)
   }
 
+  async unregister (service) {
+    const sub = this.#allSubs.find(sub => sub.service === service)
+    if (!sub) return
+    this.#pathToSub.delete(sub.path)
+    await sub.unsubscribe()
+    if (!this.#pathToSub.size) return this.stop()
+  }
+
   async handleRequest (req, res) {
-    const sub = this.#pathToSub[req.url]
+    const sub = this.#pathToSub.get(req.url)
     if (!sub) {
       console.error('Received unexpected event to: %s', req.url)
       res.writeHead(412)
@@ -106,6 +116,10 @@ class Subscription {
 
   get player () {
     return this.#service.player
+  }
+
+  get service () {
+    return this.#service
   }
 
   get path () {
@@ -176,18 +190,21 @@ class Subscription {
     this.#debug('Event received')
 
     let elem = Parsley.from(req.body)
-    const embeddedXML = elem.find('LastChange')?.text
-    if (embeddedXML && embeddedXML.isText) {
-      elem = Parsley.from(embeddedXML)
-    }
-    let data = this.#service.parseEvent(elem)
-    if (!data) return
+    let out = {}
+    let data = cleanObject(this.#service.parseEvent(elem) ?? {})
+    if (data) out = { ...out, ...data }
 
-    data = cleanObject(data)
-    if (!data) return
+    const lastChange = elem.find('LastChange')
+    if (lastChange && lastChange.isText) {
+      elem = Parsley.from(lastChange.text)
+      data = cleanObject(this.#service.parseEvent(elem) ?? {})
+      if (data) out = { ...out, ...data }
+    }
+    out = cleanObject(out)
+    if (!out) return
 
     const typ = this.#service.systemWide ? 'system' : 'player'
-    this.player.emit(typ, data)
+    this.player.emit(typ, out)
   }
 }
 

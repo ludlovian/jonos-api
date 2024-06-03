@@ -2,7 +2,7 @@ import Parsley from 'parsley'
 import sleep from 'pixutil/sleep'
 
 import config from '../config.mjs'
-import { parseElement } from './parsers.mjs'
+import parseElement from '../parseElement.mjs'
 
 const XML_PI = '<?xml version="1.0" encoding="utf-8"?>'
 
@@ -11,22 +11,30 @@ export default class SonosService {
 
   constructor (player) {
     this.#player = player
+    this.constructor.commands.forEach(cmd => {
+      if (!this[cmd]) throw new Error('Oops: ' + cmd)
+      player[cmd] = this[cmd].bind(this)
+    })
+  }
+
+  get name () {
+    return this.constructor.name
+  }
+
+  get path () {
+    return this.constructor.path
+  }
+
+  get systemWide () {
+    return !!this.constructor.systemWide
   }
 
   get player () {
     return this.#player
   }
 
-  static register (player) {
-    const Svc = this
-    const svc = new Svc(player)
-    player.services[svc.name] = svc
-
-    svc.commands.forEach(cmd => {
-      if (!svc[cmd]) throw new Error('Oops: ' + cmd)
-      player[cmd] = svc[cmd].bind(svc)
-    })
-  }
+  // default event handler does nothing
+  parseEvent () {}
 
   async callSOAP (method, parms, parse = parseElement) {
     const { url, headers, body } = this.#prepareSOAP(method, parms)

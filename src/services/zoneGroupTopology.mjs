@@ -3,15 +3,15 @@ import Parsley from 'parsley'
 import SonosService from './service.mjs'
 
 export default class ZoneGroupTopology extends SonosService {
-  name = 'ZoneGroupTopology'
-  path = 'ZoneGroupTopology'
+  static name = 'ZoneGroupTopology'
+  static path = 'ZoneGroupTopology'
 
   // this is a system wide service
-  systemWide = true
+  static systemWide = true
 
-  commands = ['getZonGroupState']
+  static commands = ['getZoneGroupState']
 
-  getZonGroupState () {
+  getZoneGroupState () {
     const Player = this.player.constructor
     return this.callSOAP('GetZoneGroupState', {}, p =>
       parseZoneGroupTopology(p, Player)

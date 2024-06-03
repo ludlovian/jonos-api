@@ -1,10 +1,10 @@
 import SonosService from './service.mjs'
 
 export default class RenderingControl extends SonosService {
-  name = 'RenderingControl'
-  path = 'MediaRenderer/RenderingControl'
+  static name = 'RenderingControl'
+  static path = 'MediaRenderer/RenderingControl'
 
-  commands = ['getVolume', 'getMute', 'setVolume', 'setMute']
+  static commands = ['getVolume', 'getMute', 'setVolume', 'setMute']
 
   getVolume () {
     const parms = { InstanceID: 0, Channel: 'Master' }

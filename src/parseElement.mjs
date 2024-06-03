@@ -1,7 +1,7 @@
 import camelCase from 'pixutil/camelCase'
-import convert from '../convert.mjs'
+import convert from './convert.mjs'
 
-export function parseElement (elem) {
+export default function parseElement (elem) {
   return Object.fromEntries(
     elem.children
       .map(child => {

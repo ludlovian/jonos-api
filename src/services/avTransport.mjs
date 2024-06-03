@@ -5,10 +5,25 @@ import { cleanObject } from '../clean.mjs'
 import SonosService from './service.mjs'
 
 export default class AVTransport extends SonosService {
-  name = 'AVTransport'
-  path = 'MediaRenderer/AVTransport'
+  static name = 'AVTransport'
+  static path = 'MediaRenderer/AVTransport'
 
-  commands = ['getPositionInfo', 'getMediaInfo', 'getTransportInfo']
+  static commands = [
+    'getPositionInfo',
+    'getMediaInfo',
+    'getTransportInfo',
+    'getPlayMode',
+    'setAVTransportURI',
+    'seekTrack',
+    'seekPos',
+    'pause',
+    'play',
+    'setPlayMode',
+    'joinGroup',
+    'startOwnGroup',
+    'emptyQueue',
+    'addUriToQueue'
+  ]
 
   getPositionInfo () {
     const parms = { InstanceID: 0 }
@@ -41,6 +56,77 @@ export default class AVTransport extends SonosService {
     })
   }
 
+  getPlayMode () {
+    const parms = { InstanceID: 0 }
+    return this.callSOAP('GetTransportSettings', parms, elem => {
+      return {
+        playMode: elem.find('PlayMode')?.text
+      }
+    })
+  }
+
+  setAVTransportURI (uri, metadata = '') {
+    const parms = {
+      InstanceID: 0,
+      CurrentURI: uri,
+      CurrentURIMetaData: metadata
+    }
+    return this.callSOAP('SetAVTransportURI', parms)
+  }
+
+  seekTrack (trackNum) {
+    const parms = { InstanceID: 0, Unit: 'TRACK_NR', Target: trackNum }
+    return this.callSOAP('Seek', parms)
+  }
+
+  seekPos (relTime) {
+    const parms = { InstanceID: 0, Unit: 'REL_TIME', Target: relTime }
+    return this.callSOAP('Seek', parms)
+  }
+
+  pause () {
+    const parms = { InstanceID: 0 }
+    return this.callSOAP('Pause', parms)
+  }
+
+  play () {
+    const parms = { InstanceID: 0, Speed: '1' }
+    return this.callSOAP('Play', parms)
+  }
+
+  setPlayMode (playMode) {
+    const parms = {
+      InstanceID: 0,
+      NewPlayMode: playMode
+    }
+    return this.callSOAP('SetPlayMode', parms)
+  }
+
+  joinGroup (uuid) {
+    return this.setAVTransportURI(`x-rincon:${uuid}`)
+  }
+
+  startOwnGroup () {
+    const parms = { InstanceID: 0 }
+    return this.callSOAP('BecomeCoordinatorOfStandaloneGroup', parms)
+  }
+
+  emptyQueue () {
+    const parms = { InstanceID: 0 }
+    return this.callSOAP('RemoveAllTracksFromQueue', parms)
+  }
+
+  addUriToQueue (uri, metadata = '') {
+    const parms = {
+      InstanceID: 0,
+      EnqueuedURI: uri,
+      EnqueuedURIMetaData: metadata,
+      DesiredFirstTrackNumberEnqueued: 0,
+      EnqueueAsNext: 0
+    }
+    return this.callSOAP('AddURIToQueue', parms)
+  }
+
   parseEvent (elem) {
     const playState = elem.find('TransportState')?.attr?.val
     const playing = playState ? isPlaying(playState) : undefined
@@ -49,14 +135,15 @@ export default class AVTransport extends SonosService {
     let trackMetadata = elem.find('CurrentTrackMetaData')?.attr?.val
     if (trackMetadata) trackMetadata = this.parseMetadata(trackMetadata)
 
-    return { playState, playing, trackUri, trackMetadata }
+    const playMode = elem.find('CurrentPlayMode')?.attr?.val
+
+    return { playState, playing, trackUri, trackMetadata, playMode }
   }
 
   parseMetadata (text) {
     if (!text) return undefined
 
     if (text === 'NOT_IMPLEMENTED') return undefined
-    console.log(text)
     const elem = Parsley.from(text.trim(), { safe: true })
     if (!elem) return text
 
