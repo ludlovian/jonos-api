@@ -51,8 +51,8 @@ export default class AVTransport extends SonosService {
     const parms = { InstanceID: 0 }
     return this.callSOAP('GetTransportInfo', parms, elem => {
       const playState = elem.find('CurrentTransportState')?.text
-      const playing = isPlaying(playState)
-      return { playState, playing }
+      const isPlaying = checkPlayState(playState)
+      return { playState, isPlaying }
     })
   }
 
@@ -129,7 +129,7 @@ export default class AVTransport extends SonosService {
 
   parseEvent (elem) {
     const playState = elem.find('TransportState')?.attr?.val
-    const playing = playState ? isPlaying(playState) : undefined
+    const isPlaying = playState ? checkPlayState(playState) : undefined
 
     const trackUri = elem.find('CurrentTrackURI')?.attr?.val
     let trackMetadata = elem.find('CurrentTrackMetaData')?.attr?.val
@@ -137,7 +137,7 @@ export default class AVTransport extends SonosService {
 
     const playMode = elem.find('CurrentPlayMode')?.attr?.val
 
-    return { playState, playing, trackUri, trackMetadata, playMode }
+    return { playState, isPlaying, trackUri, trackMetadata, playMode }
   }
 
   parseMetadata (text) {
@@ -169,6 +169,6 @@ export default class AVTransport extends SonosService {
   }
 }
 
-function isPlaying (playState) {
+function checkPlayState (playState) {
   return playState === 'PLAYING' || playState === 'TRANSITIONING'
 }
