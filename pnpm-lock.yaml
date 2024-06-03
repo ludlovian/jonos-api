@@ -1,0 +1,59 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      '@ludlovian/debug':
+        specifier: github:ludlovian/debug
+        version: https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994
+      '@lukeed/ms':
+        specifier: ^2.0.2
+        version: 2.0.2
+      parsley:
+        specifier: github:ludlovian/parsley
+        version: https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5
+      pixutil:
+        specifier: github:ludlovian/pixutil
+        version: https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b
+      timer:
+        specifier: github:ludlovian/timer
+        version: https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac
+
+packages:
+
+  '@ludlovian/debug@https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994':
+    resolution: {tarball: https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994}
+    version: 0.1.0
+
+  '@lukeed/ms@2.0.2':
+    resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
+    engines: {node: '>=8'}
+
+  parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5:
+    resolution: {tarball: https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5}
+    version: 1.2.0
+
+  pixutil@https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b:
+    resolution: {tarball: https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b}
+    version: 1.8.0
+
+  timer@https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac:
+    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac}
+    version: 2.0.2
+
+snapshots:
+
+  '@ludlovian/debug@https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994': {}
+
+  '@lukeed/ms@2.0.2': {}
+
+  parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5: {}
+
+  pixutil@https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b: {}
+
+  timer@https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac: {}

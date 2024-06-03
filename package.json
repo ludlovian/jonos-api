@@ -1,0 +1,23 @@
+{
+  "name": "jonos-api",
+  "version": "0.0.1",
+  "description": "API access to my sonos",
+  "type": "module",
+  "exports": "./src/index.js",
+  "scripts": {
+    "clean": "rm -rf coverage/ node_modules/.cache/",
+    "format": "prettier-standard '{src,test}/**/*.mjs'",
+    "lint": "standard '{src,test}/**/*.mjs' | snazzy",
+    "test": "c8 node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@ludlovian/debug": "github:ludlovian/debug",
+    "@lukeed/ms": "^2.0.2",
+    "parsley": "github:ludlovian/parsley",
+    "pixutil": "github:ludlovian/pixutil",
+    "timer": "github:ludlovian/timer"
+  }
+}
