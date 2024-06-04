@@ -7,7 +7,7 @@ settings:
 importers:
 
   .:
-    devDependencies:
+    dependencies:
       '@ludlovian/debug':
         specifier: github:ludlovian/debug
         version: https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994
