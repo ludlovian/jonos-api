@@ -11,7 +11,7 @@ import { cleanObject } from '../clean.mjs'
 const { values } = Object
 
 export default class Listener {
-  #started = false
+  #untilStarted
   #server
   #url
   #debug = Debug('jonos-api:listener')
@@ -25,13 +25,16 @@ export default class Listener {
     return this.#url
   }
 
+  get untilStarted () {
+    if (this.#untilStarted) return this.#untilStarted
+    return (this.#untilStarted = this.#start())
+  }
+
   hasService (srv) {
     return this.#allSubs.some(sub => sub.service.name === srv.name)
   }
 
-  async start () {
-    if (this.#started) return
-    this.#started = true
+  async #start () {
     const address = getMyAddress()
 
     this.#server = createServer(this.handleRequest.bind(this))
@@ -42,39 +45,55 @@ export default class Listener {
         const { address, port } = this.#server.address()
         this.#url = new URL(`http://${address}:${port}/`)
         this.#debug('Listener started on port %d', port)
-        resolve(this)
+        resolve(true)
       })
     })
   }
 
-  async stop () {
-    if (!this.#started) return
-    this.#started = false
+  async #stop () {
     const allSubs = [...this.#allSubs]
-    this.#pathToSub.clear()
-    this.#server.close()
-
-    await Promise.all(allSubs.map(sub => sub.unsubscribe()))
+    if (allSubs.length) {
+      this.#debug('Stop called with %d subs active', allSubs.length)
+      await Promise.all(allSubs.map(sub => sub.unsubscribe()))
+      this.#pathToSub.clear()
+    }
+    await new Promise((resolve, reject) => {
+      this.#server.close(err => {
+        if (err) return reject(err)
+        resolve()
+      })
+    })
     this.#debug('Listener stopped')
   }
 
+  async stop () {
+    if (this.#untilStarted === undefined) return
+    this.#untilStarted = undefined
+    await this.#stop()
+  }
+
   async register (service) {
-    await this.start()
+    await this.untilStarted
+
     if (service.systemWide && this.hasService(service)) return
 
     const sub = new Subscription(this, service)
     const path = sub.path
     this.#pathToSub.set(path, sub)
-    await sub.subscribe()
     this.#debug('%s registered', path)
+    await sub.subscribe()
   }
 
   async unregister (service) {
     const sub = this.#allSubs.find(sub => sub.service === service)
-    if (!sub) return
-    this.#pathToSub.delete(sub.path)
+    if (!sub) {
+      this.#debug('Service was never registered: %o', service)
+      return
+    }
     await sub.unsubscribe()
-    if (!this.#pathToSub.size) return this.stop()
+    this.#pathToSub.delete(sub.path)
+    this.#debug('%s unregistered', sub.path)
+    if (this.#pathToSub.size === 0) await this.stop()
   }
 
   async handleRequest (req, res) {
