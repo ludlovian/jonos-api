@@ -82,6 +82,8 @@ export default class Listener {
     if (service.systemWide && this.hasService(service)) return
 
     const sub = new Subscription(this, service)
+    service.subscription = sub
+
     const path = sub.path
     this.#pathToSub.set(path, sub)
     this.#debug('%s registered', path)
@@ -89,11 +91,13 @@ export default class Listener {
   }
 
   async unregister (service) {
-    const sub = this.#allSubs.find(sub => sub.service === service)
+    const sub = service.subscription
     if (!sub) {
+      if (service.systemWide) return undefined
       this.#debug('Service was never registered: %o', service)
       return
     }
+    service.subscription = undefined
     await sub.unsubscribe()
     this.#pathToSub.delete(sub.path)
     this.#debug('%s unregistered', sub.path)

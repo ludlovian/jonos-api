@@ -8,6 +8,7 @@ const XML_PI = '<?xml version="1.0" encoding="utf-8"?>'
 
 export default class SonosService {
   #player
+  subscription
 
   constructor (player) {
     this.#player = player
