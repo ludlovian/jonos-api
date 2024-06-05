@@ -68,6 +68,10 @@ export default class Listener {
 
   async stop () {
     if (this.#untilStarted === undefined) return
+    // wait in case we are starting
+    await this.#untilStarted
+    // check in case someone else is doing the stop
+    if (this.#untilStarted === undefined) return
     this.#untilStarted = undefined
     await this.#stop()
   }
