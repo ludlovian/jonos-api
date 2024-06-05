@@ -82,15 +82,11 @@ export default class Player extends EventEmitter {
 
   startListening () {
     const startService = async svc => this.listener.register(svc)
-    const forwardError = err => this.emit('error', err)
-
-    return Promise.all(this.#services.map(startService)).catch(forwardError)
+    return Promise.all(this.#services.map(startService))
   }
 
   stopListening () {
     const stopService = async svc => this.listener.unregister(svc)
-    const forwardError = err => this.emit('error', err)
-
-    return Promise.all(this.#services.map(stopService)).catch(forwardError)
+    return Promise.all(this.#services.map(stopService))
   }
 }

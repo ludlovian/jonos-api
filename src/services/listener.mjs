@@ -172,12 +172,13 @@ class Subscription {
     const method = 'SUBSCRIBE'
     const fn = () => fetch(this.endpoint, { method, headers })
     const resp = await this.player.exec(fn)
+    const forwardErr = err => this.player.emit('error', err)
     this.#sid = resp.headers.get('sid')
     this.#debug('Subscribed')
 
     this.#tmRenew = new Timer({
       ms: config.apiSubscriptionRenew,
-      fn: () => this.renew().catch(err => this.player.emit('error', err))
+      fn: () => this.renew().catch(forwardErr)
     })
   }
 
@@ -200,9 +201,8 @@ class Subscription {
     const headers = { sid: this.#sid }
     const method = 'UNSUBSCRIBE'
     const fn = () => fetch(this.endpoint, { method, headers })
-    const forwardErr = err => this.player.emit('error', err)
 
-    await this.player.exec(fn).catch(forwardErr)
+    await this.player.exec(fn)
     this.#debug('Unsubscribed')
   }
 

@@ -41,6 +41,8 @@ export default class SonosService {
     const { url, headers, body } = this.#prepareSOAP(method, parms)
     const fn = () => fetch(url, { method: 'POST', headers, body })
 
+    let caughtErr
+
     for (let i = 0; i < config.apiCallRetryCount; i++) {
       try {
         const response = await this.#player.exec(fn)
@@ -51,10 +53,12 @@ export default class SonosService {
         const p = Parsley.from(text).find(`u:${method}Response`)
         return parse(p)
       } catch (err) {
+        caughtErr = caughtErr ?? err
         this.#player.emit('error', err)
       }
       await sleep(config.apiCallRetryDelay)
     }
+    if (caughtErr) throw caughtErr
   }
 
   #prepareSOAP (method, parms) {
