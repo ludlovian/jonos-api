@@ -4,6 +4,7 @@ import { EventEmitter } from 'node:events'
 import Parsley from 'parsley'
 import createSerial from 'pixutil/serial'
 import timeout from 'pixutil/timeout'
+import Debug from '@ludlovian/debug'
 
 import config from './config.mjs'
 import AVTransport from './services/avTransport.mjs'
@@ -19,12 +20,13 @@ export default class Player extends EventEmitter {
   static #discovery = new Discovery()
 
   #url
+  debug
   #serial = createSerial()
   #services
 
   static async discover () {
     const url = await timeout(
-      this.#discovery.discoverOne(),
+      Player.#discovery.discoverOne(),
       config.apiDiscoveryTimeout
     )
 
@@ -39,6 +41,7 @@ export default class Player extends EventEmitter {
 
     super()
     this.#url = url
+    this.debug = Debug(`jonos-api:${url.hostname}`)
     Player.#playersByUrl[url.href] = this
     this.#services = [
       new ZoneGroupTopology(this),
@@ -90,3 +93,5 @@ export default class Player extends EventEmitter {
     return Promise.all(this.#services.map(stopService))
   }
 }
+
+if (Debug('jonos-api').enabled) global.jonosApi = { Player }

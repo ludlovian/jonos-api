@@ -1,6 +1,6 @@
 import Parsley from 'parsley'
+import guess from 'pixutil/guess'
 
-import convert from '../convert.mjs'
 import { cleanObject } from '../clean.mjs'
 import SonosService from './service.mjs'
 
@@ -29,7 +29,7 @@ export default class AVTransport extends SonosService {
     const parms = { InstanceID: 0 }
     return this.callSOAP('GetPositionInfo', parms, elem => {
       return {
-        trackNum: convert(elem.find('Track')?.text),
+        trackNum: guess(elem.find('Track')?.text),
         trackUri: elem.find('TrackURI')?.text,
         trackPos: elem.find('RelTime')?.text,
         trackMetadata: this.parseMetadata(elem.find('TrackMetaData')?.text)
@@ -150,7 +150,7 @@ export default class AVTransport extends SonosService {
     const title =
       elem.find('r:streamContent')?.text ?? elem.find('dc:title')?.text
     const album = elem.find('upnp:album')?.text
-    const trackNumber = convert(elem.find('upnp:originalTrackNumber')?.text)
+    const trackNumber = guess(elem.find('upnp:originalTrackNumber')?.text)
     const albumArtist = elem.find('r:albumArtist')?.text
     const artist = elem.find('dc:creator')?.text
     let albumArtUri = elem.find('upnp:albumArtURI')?.text

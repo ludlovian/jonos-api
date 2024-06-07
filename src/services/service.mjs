@@ -34,10 +34,16 @@ export default class SonosService {
     return this.#player
   }
 
+  get debug () {
+    return this.#player.debug
+  }
+
   // default event handler does nothing
   parseEvent () {}
 
   async callSOAP (method, parms, parse = parseElement) {
+    this.debug(method)
+
     const { url, headers, body } = this.#prepareSOAP(method, parms)
     const fn = () => fetch(url, { method: 'POST', headers, body })
 

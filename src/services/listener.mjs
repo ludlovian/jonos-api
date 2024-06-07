@@ -133,12 +133,10 @@ class Subscription {
   #service
   #tmRenew
   #sid
-  #debug
 
   constructor (listener, service) {
     this.#listener = listener
     this.#service = service
-    this.#debug = Debug(`jonos-api:${this.path}`)
   }
 
   get player () {
@@ -147,6 +145,10 @@ class Subscription {
 
   get service () {
     return this.#service
+  }
+
+  get debug () {
+    return this.#service.debug
   }
 
   get path () {
@@ -174,7 +176,7 @@ class Subscription {
     const resp = await this.player.exec(fn)
     const forwardErr = err => this.player.emit('error', err)
     this.#sid = resp.headers.get('sid')
-    this.#debug('Subscribed')
+    this.debug('Subscribed %s', this.service.name)
 
     this.#tmRenew = new Timer({
       ms: config.apiSubscriptionRenew,
@@ -192,7 +194,7 @@ class Subscription {
     const resp = await this.player.exec(fn)
     this.#sid = resp.headers.get('sid')
     this.#tmRenew.refresh()
-    this.#debug('Renewed')
+    this.debug('Renewed %s', this.service.name)
   }
 
   async unsubscribe () {
@@ -203,7 +205,7 @@ class Subscription {
     const fn = () => fetch(this.endpoint, { method, headers })
 
     await this.player.exec(fn)
-    this.#debug('Unsubscribed')
+    this.debug('Unsubscribed %s', this.service.name)
   }
 
   handleRequest (req, res) {
@@ -214,7 +216,7 @@ class Subscription {
       throw err
     }
 
-    this.#debug('Event received')
+    this.debug('%s event received', this.service.name)
 
     let elem = Parsley.from(req.body)
     let out = {}
