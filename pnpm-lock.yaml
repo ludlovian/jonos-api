@@ -16,10 +16,10 @@ importers:
         version: 2.0.2
       parsley:
         specifier: github:ludlovian/parsley
-        version: https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5
+        version: https://codeload.github.com/ludlovian/parsley/tar.gz/6432803931c906587420e66b160dab74226e60aa
       pixutil:
         specifier: github:ludlovian/pixutil
-        version: https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b
+        version: https://codeload.github.com/ludlovian/pixutil/tar.gz/016ab644da877cfc6c169f3320d40d7f7b079dc4
       timer:
         specifier: github:ludlovian/timer
         version: https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac
@@ -34,13 +34,13 @@ packages:
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
 
-  parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5:
-    resolution: {tarball: https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5}
-    version: 1.2.0
+  parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/6432803931c906587420e66b160dab74226e60aa:
+    resolution: {tarball: https://codeload.github.com/ludlovian/parsley/tar.gz/6432803931c906587420e66b160dab74226e60aa}
+    version: 1.2.1
 
-  pixutil@https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b:
-    resolution: {tarball: https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b}
-    version: 1.8.0
+  pixutil@https://codeload.github.com/ludlovian/pixutil/tar.gz/016ab644da877cfc6c169f3320d40d7f7b079dc4:
+    resolution: {tarball: https://codeload.github.com/ludlovian/pixutil/tar.gz/016ab644da877cfc6c169f3320d40d7f7b079dc4}
+    version: 1.10.1
 
   timer@https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac:
     resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac}
@@ -52,8 +52,8 @@ snapshots:
 
   '@lukeed/ms@2.0.2': {}
 
-  parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/480672633d6d5aebdc1df595769181cee24f8cb5: {}
+  parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/6432803931c906587420e66b160dab74226e60aa: {}
 
-  pixutil@https://codeload.github.com/ludlovian/pixutil/tar.gz/6cf766cd8bd95e9bf5dee286683f3fc68e774e9b: {}
+  pixutil@https://codeload.github.com/ludlovian/pixutil/tar.gz/016ab644da877cfc6c169f3320d40d7f7b079dc4: {}
 
   timer@https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac: {}
