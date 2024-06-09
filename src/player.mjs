@@ -2,9 +2,9 @@ import util from 'node:util'
 import { EventEmitter } from 'node:events'
 
 import Parsley from 'parsley'
-import createSerial from 'pixutil/serial'
 import timeout from 'pixutil/timeout'
 import Debug from '@ludlovian/debug'
+import Lock from '@ludlovian/lock'
 
 import config from './config.mjs'
 import AVTransport from './services/avTransport.mjs'
@@ -21,7 +21,7 @@ export default class Player extends EventEmitter {
 
   #url
   debug
-  #serial = createSerial()
+  #lock = new Lock() // used to serialise HTTP requests to the player
   #services
 
   static async discover () {
@@ -64,7 +64,7 @@ export default class Player extends EventEmitter {
   }
 
   exec (fn) {
-    return this.#serial.exec(timeout(fn, config.apiCallTimeout))
+    return this.#lock.exec(timeout(fn, config.apiCallTimeout))
   }
 
   async getDescription () {
@@ -94,4 +94,4 @@ export default class Player extends EventEmitter {
   }
 }
 
-if (Debug('jonos-api').enabled) global.jonosApi = { Player }
+if (Debug('jonos-api:player').enabled) global.jonosApi = { Player }

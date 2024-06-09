@@ -11,6 +11,9 @@ importers:
       '@ludlovian/debug':
         specifier: github:ludlovian/debug
         version: https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994
+      '@ludlovian/lock':
+        specifier: github:ludlovian/lock
+        version: https://codeload.github.com/ludlovian/lock/tar.gz/d1ca32b46e1e59cb8d7736f64a438dabc570555c
       '@lukeed/ms':
         specifier: ^2.0.2
         version: 2.0.2
@@ -28,6 +31,10 @@ packages:
 
   '@ludlovian/debug@https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994':
     resolution: {tarball: https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994}
+    version: 0.1.0
+
+  '@ludlovian/lock@https://codeload.github.com/ludlovian/lock/tar.gz/d1ca32b46e1e59cb8d7736f64a438dabc570555c':
+    resolution: {tarball: https://codeload.github.com/ludlovian/lock/tar.gz/d1ca32b46e1e59cb8d7736f64a438dabc570555c}
     version: 0.1.0
 
   '@lukeed/ms@2.0.2':
@@ -49,6 +56,8 @@ packages:
 snapshots:
 
   '@ludlovian/debug@https://codeload.github.com/ludlovian/debug/tar.gz/52c340a997e7be86a5c1d6e3747c3e79f8caa994': {}
+
+  '@ludlovian/lock@https://codeload.github.com/ludlovian/lock/tar.gz/d1ca32b46e1e59cb8d7736f64a438dabc570555c': {}
 
   '@lukeed/ms@2.0.2': {}
 

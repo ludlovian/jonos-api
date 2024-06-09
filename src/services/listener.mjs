@@ -3,7 +3,9 @@ import { networkInterfaces } from 'node:os'
 
 import Parsley from 'parsley'
 import Timer from 'timer'
+import timeout from 'pixutil/timeout'
 import Debug from '@ludlovian/debug'
+import Lock from '@ludlovian/lock'
 
 import config from '../config.mjs'
 import { cleanObject } from '../clean.mjs'
@@ -11,7 +13,8 @@ import { cleanObject } from '../clean.mjs'
 const { values } = Object
 
 export default class Listener {
-  #untilStarted
+  #startStopLock = new Lock() // used to serialise starting & stopping
+  #started = false
   #server
   #url
   #debug = Debug('jonos-api:listener')
@@ -25,59 +28,66 @@ export default class Listener {
     return this.#url
   }
 
-  get untilStarted () {
-    if (this.#untilStarted) return this.#untilStarted
-    return (this.#untilStarted = this.#start())
+  get started () {
+    return this.#started
   }
 
   hasService (srv) {
     return this.#allSubs.some(sub => sub.service.name === srv.name)
   }
 
-  async #start () {
-    const address = getMyAddress()
+  start () {
+    return this.#startStopLock.exec(async () => {
+      if (this.#started) return false
+      const address = getMyAddress()
 
-    this.#server = createServer(this.handleRequest.bind(this))
+      this.#server = createServer(this.handleRequest.bind(this))
 
-    return new Promise((resolve, reject) => {
-      this.#server.once('error', reject)
-      this.#server.listen(0, address, () => {
-        const { address, port } = this.#server.address()
-        this.#url = new URL(`http://${address}:${port}/`)
-        this.#debug('Listener started on port %d', port)
-        resolve(true)
+      const pStart = new Promise((resolve, reject) => {
+        this.#server.once('error', reject)
+        this.#server.listen(0, address, () => {
+          const { address, port } = this.#server.address()
+          this.#url = new URL(`http://${address}:${port}/`)
+          this.#debug('Listener started on port %d', port)
+          resolve()
+        })
       })
-    })
-  }
 
-  async #stop () {
-    const allSubs = [...this.#allSubs]
-    if (allSubs.length) {
-      this.#debug('Stop called with %d subs active', allSubs.length)
-      await Promise.all(allSubs.map(sub => sub.unsubscribe()))
-      this.#pathToSub.clear()
-    }
-    await new Promise((resolve, reject) => {
-      this.#server.close(err => {
-        if (err) return reject(err)
-        resolve()
-      })
+      await timeout(pStart, config.apiCallTimeout)
+
+      this.#started = true
+      return true
     })
-    this.#debug('Listener stopped')
   }
 
   async stop () {
-    if (this.#untilStarted === undefined) return
-    // wait in case we are starting
-    await this.#untilStarted
-    // check in case someone else is doing the stop
-    if (this.#untilStarted === undefined) return
-    this.#untilStarted = undefined
-    await this.#stop()
+    return this.#startStopLock.exec(async () => {
+      if (!this.#started) return false
+
+      const allSubs = [...this.#allSubs]
+      if (allSubs.length) {
+        this.#debug('Stop called with %d subs active', allSubs.length)
+        await Promise.all(allSubs.map(sub => sub.unsubscribe()))
+        this.#pathToSub.clear()
+      }
+
+      const pStop = new Promise((resolve, reject) => {
+        this.#server.close(err => {
+          if (err) return reject(err)
+          resolve()
+        })
+      })
+
+      await timeout(pStop, config.apiCallTimeout)
+
+      this.#started = false
+      this.#debug('Listener stopped')
+      return true
+    })
   }
 
   async register (service) {
-    await this.untilStarted
+    await this.start()
 
     if (service.systemWide && this.hasService(service)) return
 
