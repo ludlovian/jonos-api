@@ -25,7 +25,7 @@ importers:
         version: https://codeload.github.com/ludlovian/pixutil/tar.gz/016ab644da877cfc6c169f3320d40d7f7b079dc4
       timer:
         specifier: github:ludlovian/timer
-        version: https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac
+        version: https://codeload.github.com/ludlovian/timer/tar.gz/63ae96450a017484acbe31df7519b42e141967fd
 
 packages:
 
@@ -49,9 +49,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ludlovian/pixutil/tar.gz/016ab644da877cfc6c169f3320d40d7f7b079dc4}
     version: 1.10.1
 
-  timer@https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac:
-    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac}
-    version: 2.0.2
+  timer@https://codeload.github.com/ludlovian/timer/tar.gz/63ae96450a017484acbe31df7519b42e141967fd:
+    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/63ae96450a017484acbe31df7519b42e141967fd}
+    version: 2.1.0
 
 snapshots:
 
@@ -65,4 +65,4 @@ snapshots:
 
   pixutil@https://codeload.github.com/ludlovian/pixutil/tar.gz/016ab644da877cfc6c169f3320d40d7f7b079dc4: {}
 
-  timer@https://codeload.github.com/ludlovian/timer/tar.gz/22b2e247282c4275af5ff1b5dbd584c42397fdac: {}
+  timer@https://codeload.github.com/ludlovian/timer/tar.gz/63ae96450a017484acbe31df7519b42e141967fd: {}
