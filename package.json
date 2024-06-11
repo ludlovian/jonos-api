@@ -1,6 +1,6 @@
 {
   "name": "jonos-api",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "API access to my sonos",
   "type": "module",
   "exports": "./src/player.mjs",
