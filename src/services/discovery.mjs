@@ -1,8 +1,11 @@
 import dgram from 'node:dgram'
-import { EventEmitter } from 'node:events'
+import { once, EventEmitter } from 'node:events'
+
+import Lock from '@ludlovian/lock'
 
 export default class Discovery {
-  #emitter = new EventEmitter()
+  #discoveryLock = new Lock()
+  #emitter
   #socket
 
   #searchBuffer = Buffer.from(
@@ -17,11 +20,12 @@ export default class Discovery {
 
   #addrs = ['239.255.255.250', '255.255.255.255']
 
-  #untilDone () {
-    return new Promise((resolve, reject) => {
-      this.#emitter.once('error', reject)
-      this.#emitter.once('done', resolve)
-    })
+  #setup () {
+    this.#emitter = new EventEmitter()
+  }
+
+  #teardown () {
+    this.#emitter = this.#socket = undefined
   }
 
   #handleResponse (buffer, rinfo) {
@@ -30,9 +34,11 @@ export default class Discovery {
     const rgxRincon = /^X-RINCON/m
     const rgxLocation = /^LOCATION:\s*(\S+)/m
 
+    /* c8 ignore next */
     if (!rgxRincon.test(str)) return undefined
 
     const m = rgxLocation.exec(str)
+    /* c8 ignore next */
     if (!m) return undefined
 
     const href = m[1]
@@ -42,11 +48,16 @@ export default class Discovery {
 
   #bindSocket () {
     return new Promise((resolve, reject) => {
-      this.#socket.once('error', reject)
-      this.#socket.bind(() => {
+      this.#socket.once('error', reject).bind(() => {
         this.#socket.setBroadcast(true)
         resolve()
       })
+    })
+  }
+
+  #closeSocket () {
+    return new Promise((resolve, reject) => {
+      this.#socket.once('error', reject).close(resolve)
     })
   }
 
@@ -62,19 +73,25 @@ export default class Discovery {
     }
   }
 
-  async discoverOne () {
-    this.#socket = dgram.createSocket('udp4')
-    this.#socket
-      .on('error', err => this.#emitter.emit('error', err))
-      .on('message', (...args) => this.#handleResponse(...args))
+  discoverOne () {
+    return this.#discoveryLock.exec(async () => {
+      this.#setup()
 
-    const pDone = this.#untilDone()
+      this.#socket = dgram.createSocket('udp4')
+      this.#socket
+        .on('error', err => this.#emitter.emit('error', err))
+        .on('message', (...args) => this.#handleResponse(...args))
 
-    await this.#bindSocket()
-    this.#sendBroadcast()
+      const pDone = once(this.#emitter, 'done')
 
-    const url = await pDone
-    this.#socket.close()
-    return url
+      await this.#bindSocket()
+      this.#sendBroadcast()
+
+      const url = await pDone
+      await this.#closeSocket()
+      this.#teardown()
+
+      return url
+    })
   }
 }

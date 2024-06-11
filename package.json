@@ -8,17 +8,20 @@
     "clean": "rm -rf coverage/ node_modules/.cache/",
     "format": "prettier-standard '{src,test}/**/*.mjs'",
     "lint": "standard '{src,test}/**/*.mjs' | snazzy",
-    "test": "c8 node --test"
+    "test": "c8 node --test --test-concurrency=1 test/index.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ludlovian/camel": "github:ludlovian/camel",
+    "@ludlovian/configure": "github:ludlovian/configure",
     "@ludlovian/debug": "github:ludlovian/debug",
+    "@ludlovian/guess": "github:ludlovian/guess",
     "@ludlovian/lock": "github:ludlovian/lock",
-    "@lukeed/ms": "^2.0.2",
-    "parsley": "github:ludlovian/parsley",
-    "pixutil": "github:ludlovian/pixutil",
-    "timer": "github:ludlovian/timer"
+    "@ludlovian/parsley": "github:ludlovian/parsley",
+    "@ludlovian/timeout": "github:ludlovian/timeout",
+    "@ludlovian/timer": "github:ludlovian/timer",
+    "@lukeed/ms": "^2.0.2"
   }
 }

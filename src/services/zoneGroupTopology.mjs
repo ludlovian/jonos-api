@@ -1,4 +1,4 @@
-import Parsley from 'parsley'
+import Parsley from '@ludlovian/parsley'
 
 import SonosService from './service.mjs'
 
@@ -12,20 +12,19 @@ export default class ZoneGroupTopology extends SonosService {
   static commands = ['getZoneGroupState']
 
   getZoneGroupState () {
-    const Player = this.player.constructor
-    return this.callSOAP('GetZoneGroupState', {}, p =>
-      parseZoneGroupTopology(p, Player)
+    return this.callSOAP('GetZoneGroupState', {}).then(p =>
+      parseZoneGroupTopology(p)
     )
   }
 
-  parseEvent (elem) {
-    const Player = this.player.constructor
-    return parseZoneGroupTopology(elem, Player)
+  parseXmlEvent (elem) {
+    return parseZoneGroupTopology(elem)
   }
 }
 
-function parseZoneGroupTopology (p, Player) {
+function parseZoneGroupTopology (p) {
   p = p.find('ZoneGroupState')
+  /* c8 ignore next */
   if (!p) return undefined
 
   // embedded XML

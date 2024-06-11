@@ -1,8 +1,8 @@
-import Parsley from 'parsley'
-import guess from 'pixutil/guess'
+import Parsley from '@ludlovian/parsley'
+import guess from '@ludlovian/guess'
 
-import { cleanObject } from '../clean.mjs'
 import SonosService from './service.mjs'
+import cleanObject from '../clean-object.mjs'
 
 export default class AVTransport extends SonosService {
   static name = 'AVTransport'
@@ -25,32 +25,38 @@ export default class AVTransport extends SonosService {
     'addUriToQueue'
   ]
 
+  // ---------------------------------------------
+  // Get functions
+  //
+
   getPositionInfo () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetPositionInfo', parms, elem => {
-      return {
-        trackNum: guess(elem.find('Track')?.text),
-        trackUri: elem.find('TrackURI')?.text,
-        trackPos: elem.find('RelTime')?.text,
-        trackMetadata: this.parseMetadata(elem.find('TrackMetaData')?.text)
+    return this.callSOAP('GetPositionInfo', parms).then(e => {
+      const out = {
+        trackNum: guess(e.find('Track')?.text),
+        trackUri: e.find('TrackURI')?.text,
+        trackPos: e.find('RelTime')?.text,
+        trackMetadata: e.find('TrackMetaData')?.text
       }
+      if (out.trackMetadata) {
+        out.trackDetails = this.parseMetadata(out.trackMetadata)
+      }
+      return out
     })
   }
 
   getMediaInfo () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetMediaInfo', parms, elem => {
-      return {
-        mediaUri: elem.find('CurrentURI')?.text,
-        mediaMetadata: elem.find('CurrentURIMetaData')?.text
-      }
-    })
+    return this.callSOAP('GetMediaInfo', parms).then(e => ({
+      mediaUri: e.find('CurrentURI')?.text,
+      mediaMetadata: e.find('CurrentURIMetaData')?.text
+    }))
   }
 
   getTransportInfo () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetTransportInfo', parms, elem => {
-      const playState = elem.find('CurrentTransportState')?.text
+    return this.callSOAP('GetTransportInfo', parms).then(e => {
+      const playState = e.find('CurrentTransportState')?.text
       const isPlaying = checkPlayState(playState)
       return { playState, isPlaying }
     })
@@ -58,12 +64,13 @@ export default class AVTransport extends SonosService {
 
   getPlayMode () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetTransportSettings', parms, elem => {
-      return {
-        playMode: elem.find('PlayMode')?.text
-      }
-    })
+    return this.callSOAP('GetTransportSettings', parms).then(e => ({
+      playMode: e.find('PlayMode')?.text
+    }))
   }
+
+  // ---------------------------------------------
+  // AV transport setting
 
   setAVTransportURI (uri, metadata = '') {
     const parms = {
@@ -111,6 +118,9 @@ export default class AVTransport extends SonosService {
     return this.callSOAP('BecomeCoordinatorOfStandaloneGroup', parms)
   }
 
+  // ---------------------------------------------
+  // Queue setting
+
   emptyQueue () {
     const parms = { InstanceID: 0 }
     return this.callSOAP('RemoveAllTracksFromQueue', parms)
@@ -127,25 +137,28 @@ export default class AVTransport extends SonosService {
     return this.callSOAP('AddURIToQueue', parms)
   }
 
-  parseEvent (elem) {
-    const playState = elem.find('TransportState')?.attr?.val
-    const isPlaying = playState ? checkPlayState(playState) : undefined
+  // ---------------------------------------------
+  // Event parsing
 
-    const trackUri = elem.find('CurrentTrackURI')?.attr?.val
-    let trackMetadata = elem.find('CurrentTrackMetaData')?.attr?.val
-    if (trackMetadata) trackMetadata = this.parseMetadata(trackMetadata)
+  parseXmlEvent (elem) {
+    const out = {
+      playState: elem.find('TransportState')?.attr?.val,
+      trackUri: elem.find('CurrentTrackURI')?.attr?.val,
+      trackMetadata: elem.find('CurrentTrackMetaData')?.attr?.val,
+      playMode: elem.find('CurrentPlayMode')?.attr?.val
+    }
+    if (out.playState) out.isPlaying = checkPlayState(out.playState)
+    if (out.trackMetadata) {
+      out.trackDetails = this.parseMetadata(out.trackMetadata)
+    }
 
-    const playMode = elem.find('CurrentPlayMode')?.attr?.val
-
-    return { playState, isPlaying, trackUri, trackMetadata, playMode }
+    return out
   }
 
   parseMetadata (text) {
-    if (!text) return undefined
-
-    if (text === 'NOT_IMPLEMENTED') return undefined
+    if (!text || text === 'NOT_IMPLEMENTED') return undefined
     const elem = Parsley.from(text.trim(), { safe: true })
-    if (!elem) return text
+    if (!elem) return undefined
 
     const title =
       elem.find('r:streamContent')?.text ?? elem.find('dc:title')?.text

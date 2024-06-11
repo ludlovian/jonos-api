@@ -1,8 +1,12 @@
-import Parsley from 'parsley'
-import sleep from 'pixutil/sleep'
+import { setTimeout as sleep } from 'node:timers/promises'
+import assert from 'node:assert'
+
+import Parsley from '@ludlovian/parsley'
 
 import config from '../config.mjs'
-import parseElement from '../parseElement.mjs'
+import cleanObject from '../clean-object.mjs'
+
+import Subscription from './subscription.mjs'
 
 const XML_PI = '<?xml version="1.0" encoding="utf-8"?>'
 
@@ -13,9 +17,10 @@ export default class SonosService {
   constructor (player) {
     this.#player = player
     this.constructor.commands.forEach(cmd => {
-      if (!this[cmd]) throw new Error('Oops: ' + cmd)
+      assert.ok(!!this[cmd])
       player[cmd] = this[cmd].bind(this)
     })
+    this.#player.on(this.name + ':xml', this.onXmlEvent.bind(this))
   }
 
   get name () {
@@ -34,15 +39,29 @@ export default class SonosService {
     return this.#player
   }
 
+  get listener () {
+    return this.player.listener
+  }
+
   get debug () {
     return this.#player.debug
   }
 
-  // default event handler does nothing
-  parseEvent () {}
+  get isListening () {
+    return !!this.subscription
+  }
 
-  async callSOAP (method, parms, parse = parseElement) {
-    this.debug(method)
+  onXmlEvent (elem) {
+    let data = this.parseXmlEvent(elem)
+    if (data) data = cleanObject(data)
+    if (data) this.player.emit(this.name, data)
+  }
+
+  // default parser does nothing
+  parseXmlEvent () {}
+
+  async callSOAP (method, parms, parse) {
+    this.debug(method, parms)
 
     const { url, headers, body } = this.#prepareSOAP(method, parms)
     const fn = () => fetch(url, { method: 'POST', headers, body })
@@ -52,16 +71,20 @@ export default class SonosService {
     for (let i = 0; i < config.apiCallRetryCount; i++) {
       try {
         const response = await this.#player.exec(fn)
+        /* c8 ignore start */
         if (!response.ok) {
           throw Object.assign(new Error('Bad response'), { response })
         }
+        /* c8 ignore end */
         const text = await response.text()
         const p = Parsley.from(text).find(`u:${method}Response`)
-        return parse(p)
+        return parse ? parse(p) : p
+        /* c8 ignore start */
       } catch (err) {
         caughtErr = caughtErr ?? err
         this.#player.emit('error', err)
       }
+      /* c8 ignore end */
       await sleep(config.apiCallRetryDelay)
     }
     if (caughtErr) throw caughtErr
@@ -92,5 +115,26 @@ export default class SonosService {
         .xml()
 
     return { url, headers, body }
+  }
+
+  async startListening () {
+    if (this.subscription) return
+    const listener = this.listener
+
+    await listener.start()
+    if (this.systemWide && listener.hasService(this.name)) return
+
+    const sub = (this.subscription = new Subscription(this))
+    listener.registerPath(sub.path, sub)
+    await sub.subscribe()
+  }
+
+  async stopListening () {
+    if (!this.subscription) return
+
+    const sub = this.subscription
+    await sub.unsubscribe()
+    await this.listener.unregisterPath(sub.path)
+    this.subscription = undefined
   }
 }

@@ -1,3 +1,5 @@
+import guess from '@ludlovian/guess'
+
 import SonosService from './service.mjs'
 
 export default class RenderingControl extends SonosService {
@@ -8,51 +10,35 @@ export default class RenderingControl extends SonosService {
 
   getVolume () {
     const parms = { InstanceID: 0, Channel: 'Master' }
-    return this.callSOAP('GetVolume', parms, p => {
-      return {
-        volume: parseVolume(p.get('CurrentVolume')?.text)
-      }
-    })
+    return this.callSOAP('GetVolume', parms).then(p => ({
+      volume: guess(p.get('CurrentVolume')?.text)
+    }))
   }
 
   getMute () {
     const parms = { InstanceID: 0, Channel: 'Master' }
-    return this.callSOAP('GetMute', parms, p => {
-      return {
-        mute: parseMute(p.get('CurrentMute')?.text)
-      }
-    })
+    return this.callSOAP('GetMute', parms).then(p => ({
+      mute: guess(p.get('CurrentMute')?.text, { bool: true })
+    }))
   }
 
-  setVolume (vol) {
+  async setVolume (vol) {
     const parms = { InstanceID: 0, Channel: 'Master', DesiredVolume: vol }
-    return this.callSOAP('SetVolume', parms)
+    await this.callSOAP('SetVolume', parms)
   }
 
-  setMute (mute) {
+  async setMute (mute) {
     mute = mute ? '1' : '0'
     const parms = { InstanceID: 0, Channel: 'Master', DesiredMute: mute }
-    return this.callSOAP('SetMute', parms)
+    await this.callSOAP('SetMute', parms)
   }
 
-  parseEvent (elem) {
+  parseXmlEvent (e) {
     return {
-      volume: parseVolume(elem.find(master('Volume'))?.attr?.val),
-      mute: parseMute(elem.find(master('Mute'))?.attr?.val)
+      volume: guess(e.find(master('Volume'))?.attr?.val),
+      mute: guess(e.find(master('Mute'))?.attr?.val, { bool: true })
     }
   }
-}
-
-function parseVolume (x) {
-  if (x == null) return x
-  x = +x
-  if (isNaN(x)) return undefined
-  return x
-}
-
-function parseMute (x) {
-  if (x == null) return x
-  return Boolean(+x)
 }
 
 function master (type) {

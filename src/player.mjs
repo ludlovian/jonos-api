@@ -1,8 +1,8 @@
 import util from 'node:util'
 import { EventEmitter } from 'node:events'
 
-import Parsley from 'parsley'
-import timeout from 'pixutil/timeout'
+import Parsley from '@ludlovian/parsley'
+import timeout from '@ludlovian/timeout'
 import Debug from '@ludlovian/debug'
 import Lock from '@ludlovian/lock'
 
@@ -55,8 +55,16 @@ export default class Player extends EventEmitter {
     return `Player { ${this.url.href} }`
   }
 
+  get services () {
+    return Object.fromEntries(this.#services.map(svc => [svc.name, svc]))
+  }
+
   get listener () {
     return Player.listener
+  }
+
+  get isListening () {
+    return this.#services.some(s => s.isListening)
   }
 
   get url () {
@@ -84,13 +92,12 @@ export default class Player extends EventEmitter {
   }
 
   startListening () {
-    const startService = async svc => this.listener.register(svc)
-    return Promise.all(this.#services.map(startService))
+    return Promise.all(this.#services.map(svc => svc.startListening()))
   }
 
-  stopListening () {
-    const stopService = async svc => this.listener.unregister(svc)
-    return Promise.all(this.#services.map(stopService))
+  async stopListening () {
+    if (!this.isListening) return
+    return Promise.all(this.#services.map(svc => svc.stopListening()))
   }
 }
 
