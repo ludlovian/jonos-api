@@ -1,20 +1,45 @@
 import { suite, test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
+import { inspect } from 'node:util'
 
 import Player from '../src/player.mjs'
-import setup from './helpers/setup.mjs'
+import helper from './helper.mjs'
 
 suite('Player', async t => {
-  let ctx
-  before(async () => (ctx = await setup()))
-  after(async () => ctx.stop())
+  const name = 'study'
+  let player
+  before(async () => {
+    await helper.before()
+    player = new Player(helper.urlByName[name])
+  })
+  after(helper.after)
 
   await test('construction', async () => {
-    const url = ctx.byName.study.url
-    const p = new Player(url)
+    assert.ok(player instanceof Player)
+    assert.ok(player.url instanceof URL)
+    assert.ok(player === helper.playerByName[name])
+  })
 
-    assert.ok(p.url instanceof URL)
-    assert.ok(p.url.href === url)
-    assert.ok(p === ctx.byName.study.api, 'Instances are re=used')
+  test('representation', () => {
+    const url = helper.urlByName[name]
+    const exp = `Player { ${url} }`
+    const act = inspect(player)
+    assert.strictEqual(act, exp)
+  })
+
+  test('description', async () => {
+    const res = await player.getDescription()
+    assert.ok(typeof res.fullName === 'string')
+    assert.ok(typeof res.model === 'string')
+    assert.ok(typeof res.uuid === 'string')
+    assert.strictEqual(res.uuid, helper.uuidByName[name])
+  })
+
+  test('start & stop listening', async () => {
+    await player.startListening()
+    await player.startListening()
+
+    await player.stopListening()
+    await player.stopListening()
   })
 })

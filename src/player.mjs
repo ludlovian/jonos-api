@@ -101,4 +101,5 @@ export default class Player extends EventEmitter {
   }
 }
 
+/* c8 ignore next */
 if (Debug('jonos-api:player').enabled) global.jonosApi = { Player }

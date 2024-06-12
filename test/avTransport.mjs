@@ -7,7 +7,7 @@ import helper from './helper.mjs'
 
 suite('AVTransport', () => {
   const name = 'study'
-  const mediaUri = [
+  const tracks = [
     'x-file-cifs://data2.local/data/Adrian-Chandler/The-Italian-Job/track01.flac',
     'x-file-cifs://data2.local/data/Adrian-Chandler/The-Italian-Job/track02.flac'
   ]
@@ -23,31 +23,54 @@ suite('AVTransport', () => {
 
   test('set queue', async () => {
     const uuid = helper.uuidByName[name]
-    await player.setAVTransportURI(`x-rincon-queue:${uuid}#0`)
+    const mediaUri = `x-rincon-queue:${uuid}#0`
+    const playMode = 'NORMAL'
+    await player.setAVTransportURI(mediaUri)
 
     await player.emptyQueue()
-    await player.addUriToQueue(mediaUri[0])
-    await player.addUriToQueue(mediaUri[1])
+    await player.addUriToQueue(tracks[0])
+    await player.addUriToQueue(tracks[1])
+    await player.setPlayMode(playMode)
 
-    const { queue } = await player.getQueue()
+    let res
+    res = await player.getQueue()
+    assert.deepStrictEqual(res.queue, tracks)
 
-    assert.deepStrictEqual(queue, mediaUri)
+    res = await player.getMediaInfo()
+    assert.strictEqual(res.mediaUri, mediaUri)
+
+    res = await player.getPlayMode()
+    assert.strictEqual(res.playMode, playMode)
   })
 
   test('play & pause', async () => {
     await player.play()
 
     await delay(2000)
+    const res = await player.getTransportInfo()
+    assert.strictEqual(res.isPlaying, true)
 
     await player.pause()
   })
 
   test('seek', async () => {
-    await player.seekTrack(2)
-    await player.seekPos('0:00:10')
+    const trackPos = '0:00:10'
+    const trackNum = 2
+
+    await player.seekTrack(trackNum)
+    await player.seekPos(trackPos)
+
     const res = await player.getPositionInfo()
-    assert.strictEqual(res.trackNum, 2)
-    assert.strictEqual(res.trackUri, mediaUri[1])
-    assert.strictEqual(res.trackPos, '0:00:10')
+    assert.strictEqual(res.trackNum, trackNum)
+    assert.strictEqual(res.trackUri, tracks[1])
+    assert.strictEqual(res.trackPos, trackPos)
+  })
+
+  test('groups', async () => {
+    const leader = 'bookroom'
+    const uuid = helper.uuidByName[leader]
+
+    await player.joinGroup(uuid)
+    await player.startOwnGroup()
   })
 })
