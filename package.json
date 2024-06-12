@@ -1,5 +1,5 @@
 {
-  "name": "jonos-api",
+  "name": "@ludlovian/jonos-api",
   "version": "0.4.0",
   "description": "API access to my sonos",
   "type": "module",
