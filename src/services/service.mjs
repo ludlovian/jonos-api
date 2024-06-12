@@ -71,6 +71,7 @@ export default class SonosService {
     for (let i = 0; i < config.apiCallRetryCount; i++) {
       try {
         const response = await this.#player.exec(fn)
+        // defensive check: should never happen
         /* c8 ignore start */
         if (!response.ok) {
           throw Object.assign(new Error('Bad response'), { response })
@@ -79,6 +80,7 @@ export default class SonosService {
         const text = await response.text()
         const p = Parsley.from(text).find(`u:${method}Response`)
         return parse ? parse(p) : p
+        // defensive check: should never happen
         /* c8 ignore start */
       } catch (err) {
         caughtErr = caughtErr ?? err

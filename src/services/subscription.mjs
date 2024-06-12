@@ -70,6 +70,7 @@ export default class Subscription {
     })
   }
 
+  // not tested as it would take too long!
   /* c8 ignore start */
   async renew () {
     const headers = {
@@ -98,6 +99,7 @@ export default class Subscription {
 
   handleRequest (req, res) {
     const sid = req.headers.sid
+    // defensive check: should never happen
     /* c8 ignore start */
     if (sid !== this.#sid) {
       const err = new Error(`Unexpected SID recevied: ${sid}`)

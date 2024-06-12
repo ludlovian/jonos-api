@@ -34,10 +34,12 @@ export default class Discovery {
     const rgxRincon = /^X-RINCON/m
     const rgxLocation = /^LOCATION:\s*(\S+)/m
 
+    // defensive check: should never happen
     /* c8 ignore next */
     if (!rgxRincon.test(str)) return undefined
 
     const m = rgxLocation.exec(str)
+    // defensive check: should never happen
     /* c8 ignore next */
     if (!m) return undefined
 

@@ -55,10 +55,12 @@ export default class Listener {
 
   async stop () {
     return this.#startStopLock.exec(async () => {
+      // defensive check: should never happen
       /* c8 ignore next */
       if (!this.#started) return false
 
       const allSubs = [...this.#allSubs]
+      // defensive check: should never happen
       /* c8 ignore start */
       if (allSubs.length) {
         console.error(
@@ -95,6 +97,7 @@ export default class Listener {
 
   async handleRequest (req, res) {
     const sub = this.#pathToSub.get(req.url)
+    // defensive check: should never happen
     /* c8 ignore start */
     if (!sub) {
       console.error('Received unexpected event to: %s', req.url)
