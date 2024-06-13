@@ -6,7 +6,9 @@ import {
   parsePlayState,
   parseMetadata,
   parseZoneGroupTopology,
-  parseQueue
+  parseQueue,
+  parseDuration,
+  formatDuration
 } from '../src/parsers.mjs'
 
 suite('parsers', { concurrency: false }, () => {
@@ -232,6 +234,58 @@ suite('parsers', { concurrency: false }, () => {
       exp = undefined
       act = parseQueue(Parsley.from(xml))
       assert.deepStrictEqual(act, exp)
+    })
+  })
+
+  suite('parseDuration', () => {
+    let str
+    let act
+    let exp
+
+    test('regular duration', () => {
+      str = '1:02:03'
+      exp = (1 * 3600 + 2 * 60 + 3) * 1000
+      act = parseDuration(str)
+      assert.strictEqual(act, exp)
+    })
+
+    test('invalid', () => {
+      str = 'x'
+      exp = 'x'
+      act = parseDuration(str)
+      assert.strictEqual(act, exp)
+
+      str = undefined
+      exp = undefined
+      act = parseDuration(str)
+      assert.strictEqual(act, exp)
+    })
+
+    test('no hours', () => {
+      str = '02:03'
+      exp = (2 * 60 + 3) * 1000
+      act = parseDuration(str)
+      assert.strictEqual(act, exp)
+    })
+
+    test('no mins', () => {
+      str = '03'
+      exp = 3 * 1000
+      act = parseDuration(str)
+      assert.strictEqual(act, exp)
+    })
+  })
+
+  suite('formatDuration', () => {
+    let ms
+    let act
+    let exp
+
+    test('regular', () => {
+      ms = (1 * 3600 + 2 * 60 + 3) * 1000
+      exp = '1:02:03'
+      act = formatDuration(ms)
+      assert.strictEqual(act, exp)
     })
   })
 })

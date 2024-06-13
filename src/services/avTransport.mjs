@@ -1,7 +1,12 @@
 import guess from '@ludlovian/guess'
 
 import SonosService from './service.mjs'
-import { parsePlayState, parseMetadata } from '../parsers.mjs'
+import {
+  parsePlayState,
+  parseMetadata,
+  parseDuration,
+  formatDuration
+} from '../parsers.mjs'
 
 export default class AVTransport extends SonosService {
   static name = 'AVTransport'
@@ -35,7 +40,8 @@ export default class AVTransport extends SonosService {
       return {
         trackNum: guess(e.find('Track')?.text),
         trackUri: e.find('TrackURI')?.text,
-        trackPos: e.find('RelTime')?.text,
+        trackPos: parseDuration(e.find('RelTime')?.text),
+        trackDuration: parseDuration(e.find('TrackDuration')?.text),
         trackMetadata,
         ...parseMetadata(trackMetadata)
       }
@@ -86,7 +92,11 @@ export default class AVTransport extends SonosService {
   }
 
   seekPos (relTime) {
-    const parms = { InstanceID: 0, Unit: 'REL_TIME', Target: relTime }
+    const parms = {
+      InstanceID: 0,
+      Unit: 'REL_TIME',
+      Target: formatDuration(relTime)
+    }
     return this.callSOAP('Seek', parms)
   }
 
@@ -148,6 +158,9 @@ export default class AVTransport extends SonosService {
       ...parsePlayState(playState),
 
       trackUri: elem.find('CurrentTrackURI')?.attr?.val,
+      trackDuration: parseDuration(
+        elem.find('CurrentTrackDuration')?.attr?.val
+      ),
       trackMetadata,
       ...parseMetadata(trackMetadata),
 

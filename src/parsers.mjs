@@ -71,3 +71,25 @@ export function parseQueue (elem) {
 
   return { queue }
 }
+
+export function parseDuration (duration) {
+  if (duration === undefined) return undefined
+  const [s, m, h] = duration
+    .split(':')
+    .reverse()
+    .map(x => +x)
+  if (isNaN(s)) return duration
+  const secs = s + 60 * (m ?? 0) + 60 * 60 * (h ?? 0)
+  return secs * 1000
+}
+
+export function formatDuration (ms) {
+  const secs = Math.round(ms / 1000)
+  const mins = Math.floor(secs / 60)
+  const hrs = Math.floor(mins / 60)
+
+  const ss = (secs % 60).toString().padStart(2, '0')
+  const mm = (mins % 60).toString().padStart(2, '0')
+  const hh = hrs.toString()
+  return `${hh}:${mm}:${ss}`
+}

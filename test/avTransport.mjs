@@ -54,7 +54,7 @@ suite('AVTransport', () => {
   })
 
   test('seek', async () => {
-    const trackPos = '0:00:10'
+    const trackPos = 10 * 1000
     const trackNum = 2
 
     await player.seekTrack(trackNum)
