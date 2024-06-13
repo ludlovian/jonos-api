@@ -34,6 +34,15 @@ export default class Player extends EventEmitter {
     return p.getZoneGroupState()
   }
 
+  // only used if things are bad
+  /* c8 ignore start */
+  static hardReset () {
+    console.warn('Hard reset of all players & listener')
+    this.listener.reset()
+    this.#playersByUrl = {}
+  }
+  /* c8 ignore end */
+
   constructor (url) {
     url = new URL(url)
     const player = Player.#playersByUrl[url.href]

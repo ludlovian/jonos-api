@@ -17,6 +17,17 @@ export default class Listener {
   #debug = Debug('jonos-api:listener')
   #pathToSub = new Map() // map by path
 
+  // only ever used if things are very bad
+  /* c8 ignore start */
+  hardReset () {
+    // hard reset
+    this.#pathToSub = new Map()
+    if (this.#started) this.#server.close()
+    this.#server = this.#url = undefined
+    this.#started = false
+  }
+  /* c8 ignore end */
+
   get #allSubs () {
     return [...this.#pathToSub.values()]
   }
