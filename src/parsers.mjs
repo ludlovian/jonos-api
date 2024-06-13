@@ -11,9 +11,10 @@ export function parsePlayState (playState) {
 }
 
 export function parseMetadata (text) {
-  if (!text || text === 'NOT_IMPLEMENTED') return {}
+  const trackDetails = {}
+  if (!text || text === 'NOT_IMPLEMENTED') return { trackDetails }
   const elem = Parsley.from(text.trim(), { safe: true })
-  if (!elem) return {}
+  if (!elem) return { trackDetails }
 
   let title = elem.find('r:streamContent')?.text
   if (!title) title = elem.find('dc:title')?.text
@@ -22,15 +23,18 @@ export function parseMetadata (text) {
   const albumArtist = elem.find('r:albumArtist')?.text
   const artist = elem.find('dc:creator')?.text
 
-  const trackDetails = cleanObject({
-    title,
-    album,
-    trackNumber,
-    albumArtist,
-    artist
-  })
+  Object.assign(
+    trackDetails,
+    cleanObject({
+      title,
+      album,
+      trackNumber,
+      albumArtist,
+      artist
+    }) ?? {}
+  )
 
-  return trackDetails ? { trackDetails } : {}
+  return { trackDetails }
 }
 
 export function parseZoneGroupTopology (p) {

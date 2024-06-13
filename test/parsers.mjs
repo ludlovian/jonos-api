@@ -98,29 +98,29 @@ suite('parsers', { concurrency: false }, () => {
 
     test('empty XML object', () => {
       xml = '<foo />'
-      exp = {}
+      exp = { trackDetails: {} }
       act = parseMetadata(xml)
       assert.deepStrictEqual(act, exp)
     })
 
     test('other invalids', () => {
       xml = 'NOT_IMPLEMENTED'
-      exp = {}
+      exp = { trackDetails: {} }
       act = parseMetadata(xml)
       assert.deepStrictEqual(act, exp)
 
       xml = 'foobar'
-      exp = {}
+      exp = { trackDetails: {} }
       act = parseMetadata(xml)
       assert.deepStrictEqual(act, exp)
 
       xml = ''
-      exp = {}
+      exp = { trackDetails: {} }
       act = parseMetadata(xml)
       assert.deepStrictEqual(act, exp)
 
       xml = undefined
-      exp = {}
+      exp = { trackDetails: {} }
       act = parseMetadata(xml)
       assert.deepStrictEqual(act, exp)
     })
