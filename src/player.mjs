@@ -38,7 +38,7 @@ export default class Player extends EventEmitter {
   /* c8 ignore start */
   static hardReset () {
     console.warn('Hard reset of all players & listener')
-    this.listener.reset()
+    this.listener.hardReset()
     this.#playersByUrl = {}
   }
   /* c8 ignore end */
