@@ -1,12 +1,9 @@
 import guess from '@ludlovian/guess'
 
 import SonosService from './service.mjs'
-import {
-  parsePlayState,
-  parseMetadata,
-  parseDuration,
-  formatDuration
-} from '../parsers.mjs'
+import C from './constants.mjs'
+
+import { parsePlayState, parseDuration, formatDuration } from '../parsers.mjs'
 
 export default class AVTransport extends SonosService {
   static name = 'AVTransport'
@@ -36,14 +33,12 @@ export default class AVTransport extends SonosService {
   getPositionInfo () {
     const parms = { InstanceID: 0 }
     return this.callSOAP('GetPositionInfo', parms).then(e => {
-      const trackMetadata = e.find('TrackMetaData')?.text
       return {
         trackNum: guess(e.find('Track')?.text),
         trackUri: e.find('TrackURI')?.text,
+        trackMetadata: e.find('TrackMetaData')?.text,
         trackPos: parseDuration(e.find('RelTime')?.text),
-        trackDuration: parseDuration(e.find('TrackDuration')?.text),
-        trackMetadata,
-        ...parseMetadata(trackMetadata)
+        trackDuration: parseDuration(e.find('TrackDuration')?.text)
       }
     })
   }
@@ -119,7 +114,7 @@ export default class AVTransport extends SonosService {
   }
 
   joinGroup (uuid) {
-    return this.setAVTransportURI(`x-rincon:${uuid}`)
+    return this.setAVTransportURI(C.FOLLOW + uuid)
   }
 
   startOwnGroup () {
@@ -151,18 +146,16 @@ export default class AVTransport extends SonosService {
 
   parseXmlEvent (elem) {
     const playState = elem.find('TransportState')?.attr?.val
-    const trackMetadata = elem.find('CurrentTrackMetaData')?.attr?.val
 
     return {
       playState,
       ...parsePlayState(playState),
 
       trackUri: elem.find('CurrentTrackURI')?.attr?.val,
+      trackMetadata: elem.find('CurrentTrackMetaData')?.attr?.val,
       trackDuration: parseDuration(
         elem.find('CurrentTrackDuration')?.attr?.val
       ),
-      trackMetadata,
-      ...parseMetadata(trackMetadata),
 
       playMode: elem.find('CurrentPlayMode')?.attr?.val
     }

@@ -109,6 +109,3 @@ export default class Player extends EventEmitter {
     return Promise.all(this.#services.map(svc => svc.stopListening()))
   }
 }
-
-/* c8 ignore next */
-if (Debug('jonos-api:player').enabled) global.jonosApi = { Player }

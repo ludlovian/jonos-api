@@ -4,7 +4,6 @@ import Parsley from '@ludlovian/parsley'
 
 import {
   parsePlayState,
-  parseMetadata,
   parseZoneGroupTopology,
   parseQueue,
   parseDuration,
@@ -39,89 +38,6 @@ suite('parsers', { concurrency: false }, () => {
       playState = undefined
       exp = {}
       act = parsePlayState(playState)
-      assert.deepStrictEqual(act, exp)
-    })
-  })
-
-  suite('parseMetadata', () => {
-    let xml
-    let exp
-    let act
-    test('full set', () => {
-      xml = [
-        '<foo>',
-        '<r:streamContent>title</r:streamContent>',
-        '<dc:title>title2</dc:title>',
-        '<upnp:album>album</upnp:album>',
-        '<upnp:originalTrackNumber>17</upnp:originalTrackNumber>',
-        '<r:albumArtist>albumArtist</r:albumArtist>',
-        '<dc:creator>artist</dc:creator>',
-        '</foo>'
-      ].join('')
-      exp = {
-        trackDetails: {
-          title: 'title',
-          album: 'album',
-          trackNumber: 17,
-          albumArtist: 'albumArtist',
-          artist: 'artist'
-        }
-      }
-
-      act = parseMetadata(xml)
-      assert.deepStrictEqual(act, exp)
-    })
-
-    test('no stream Content', () => {
-      xml = [
-        '<foo>',
-        '<dc:title>title2</dc:title>',
-        '<upnp:album>album</upnp:album>',
-        '<upnp:originalTrackNumber>17</upnp:originalTrackNumber>',
-        '<r:albumArtist>albumArtist</r:albumArtist>',
-        '<dc:creator>artist</dc:creator>',
-        '</foo>'
-      ].join('')
-      exp = {
-        trackDetails: {
-          title: 'title2',
-          album: 'album',
-          trackNumber: 17,
-          albumArtist: 'albumArtist',
-          artist: 'artist'
-        }
-      }
-
-      act = parseMetadata(xml)
-      assert.deepStrictEqual(act, exp)
-    })
-
-    test('empty XML object', () => {
-      xml = '<foo />'
-      exp = { trackDetails: {} }
-      act = parseMetadata(xml)
-      assert.deepStrictEqual(act, exp)
-    })
-
-    test('other invalids', () => {
-      xml = 'NOT_IMPLEMENTED'
-      exp = { trackDetails: {} }
-      act = parseMetadata(xml)
-      assert.deepStrictEqual(act, exp)
-
-      xml = 'foobar'
-      exp = { trackDetails: {} }
-      act = parseMetadata(xml)
-      assert.deepStrictEqual(act, exp)
-
-      xml = ''
-      exp = { trackDetails: {} }
-      act = parseMetadata(xml)
-      assert.deepStrictEqual(act, exp)
-
-      xml = undefined
-      exp = { trackDetails: {} }
-      act = parseMetadata(xml)
       assert.deepStrictEqual(act, exp)
     })
   })
