@@ -1,7 +1,7 @@
 import guess from '@ludlovian/guess'
 
 import SonosService from './service.mjs'
-import C from './constants.mjs'
+import C from '../constants.mjs'
 
 import { parsePlayState, parseDuration, formatDuration } from '../parsers.mjs'
 
