@@ -83,6 +83,7 @@ export default class SonosService {
         // defensive check: should never happen
         /* c8 ignore start */
       } catch (err) {
+        err.jonos = { method, parms }
         caughtErr = caughtErr ?? err
         this.#player.emit('error', err)
       }
