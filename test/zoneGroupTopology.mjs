@@ -26,4 +26,13 @@ suite('ZoneGroupTopology', t => {
     assert.ok(typeof entry.fullName === 'string')
     assert.ok(typeof entry.leaderUuid === 'string')
   })
+
+  test('getCurrentGroup', async () => {
+    const data = await player.getCurrentGroup()
+
+    assert.ok(typeof data.leaderUuid === 'string')
+    assert.ok(Array.isArray(data.memberUuids))
+    assert.ok(data.memberUuids.includes(data.leaderUuid))
+    assert.ok(data.memberUuids.includes(helper.uuidByName[name]))
+  })
 })
