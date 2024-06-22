@@ -1,5 +1,7 @@
 export default function cleanObject (obj) {
-  const kvList = Object.entries(obj).filter(
+  // defensive check
+  /* c8 ignore next */
+  const kvList = Object.entries(obj ?? {}).filter(
     ([key, value]) => value !== undefined
   )
   return kvList.length ? Object.fromEntries(kvList) : undefined

@@ -42,4 +42,11 @@ suite('Event', () => {
     assert.ok(typeof data.volume === 'number')
     assert.ok(typeof data.mute === 'boolean')
   })
+
+  test('ContentDirectory', async () => {
+    const svcName = 'ContentDirectory'
+    const [data] = await pEvent[svcName]
+
+    assert.ok(typeof data.libraryUpdating === 'boolean')
+  })
 })

@@ -1,10 +1,9 @@
 import { suite, test } from 'node:test'
 import assert from 'node:assert/strict'
-import Parsley from '@ludlovian/parsley'
 
 import {
   parsePlayState,
-  parseZoneGroupTopology,
+  parseZoneGroupState,
   parseQueue,
   parseDuration,
   formatDuration
@@ -42,7 +41,7 @@ suite('parsers', { concurrency: false }, () => {
     })
   })
 
-  suite('parseZoneGroupTopology', () => {
+  suite('parseZoneGroupState', () => {
     let xml
     let exp
     let act
@@ -75,51 +74,14 @@ suite('parsers', { concurrency: false }, () => {
           }
         ]
       }
-      const elem = Parsley.create('ZoneGroupState', {}, [xml])
-      act = parseZoneGroupTopology(elem)
-      assert.deepStrictEqual(act, exp)
-    })
-
-    test('Zone group state unpacked', t => {
-      xml = [
-        '<foo>',
-        '<ZoneGroupState>',
-        '<ZoneGroup Coordinator="uuid1">',
-        '<ZoneGroupMember Location="http://url1/blah" UUID="uuid1" ZoneName="name1" />',
-        '<ZoneGroupMember Location="http://url2/blah" UUID="uuid2" ZoneName="name2" />',
-        '</ZoneGroup>',
-        '<ZoneGroup Coordinator="uuid3">',
-        '<ZoneGroupMember Location="http://url3/blah" UUID="uuid3" ZoneName="name3" Invisible="1" />',
-        '</ZoneGroup>',
-        '</ZoneGroupState>',
-        '</foo>'
-      ].join('')
-      exp = {
-        players: [
-          {
-            url: 'http://url1/',
-            uuid: 'uuid1',
-            fullName: 'name1',
-            leaderUuid: ''
-          },
-          {
-            url: 'http://url2/',
-            uuid: 'uuid2',
-            fullName: 'name2',
-            leaderUuid: 'uuid1'
-          }
-        ]
-      }
-      const elem = Parsley.from(xml)
-      act = parseZoneGroupTopology(elem)
+      act = parseZoneGroupState(xml)
       assert.deepStrictEqual(act, exp)
     })
 
     test('No Zone group state', t => {
-      xml = ['<foo>', '</foo>'].join('')
+      xml = ''
       exp = undefined
-      const elem = Parsley.from(xml)
-      act = parseZoneGroupTopology(elem)
+      act = parseZoneGroupState(xml)
       assert.deepStrictEqual(act, exp)
     })
   })
@@ -128,6 +90,7 @@ suite('parsers', { concurrency: false }, () => {
     let xml
     let act
     let exp
+    let obj
 
     test('regular queue', () => {
       xml = [
@@ -137,18 +100,16 @@ suite('parsers', { concurrency: false }, () => {
         '</items>'
       ].join('')
       exp = { queue: ['item1', 'item2'] }
+      obj = { result: xml }
 
-      const wrappedXml =
-        '<foo><Result>' + Parsley.encode(xml) + '</Result></foo>'
-
-      act = parseQueue(Parsley.from(wrappedXml))
+      act = parseQueue(obj)
       assert.deepStrictEqual(act, exp)
     })
 
     test('missing queue', () => {
-      xml = '<foo />'
+      obj = {}
       exp = undefined
-      act = parseQueue(Parsley.from(xml))
+      act = parseQueue(obj)
       assert.deepStrictEqual(act, exp)
     })
   })

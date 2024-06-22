@@ -1,11 +1,10 @@
 import { setTimeout as sleep } from 'node:timers/promises'
 import assert from 'node:assert'
-
 import Parsley from '@ludlovian/parsley'
 
 import config from '../config.mjs'
 import cleanObject from '../clean-object.mjs'
-
+import { parseElementTexts, parseElementVals } from '../parse-element.mjs'
 import Subscription from './subscription.mjs'
 
 const XML_PI = '<?xml version="1.0" encoding="utf-8"?>'
@@ -20,7 +19,6 @@ export default class SonosService {
       assert.ok(!!this[cmd])
       player[cmd] = this[cmd].bind(this)
     })
-    this.#player.on(this.name + ':xml', this.onXmlEvent.bind(this))
   }
 
   get name () {
@@ -29,10 +27,6 @@ export default class SonosService {
 
   get path () {
     return this.constructor.path
-  }
-
-  get systemWide () {
-    return !!this.constructor.systemWide
   }
 
   get player () {
@@ -51,14 +45,36 @@ export default class SonosService {
     return !!this.subscription
   }
 
-  onXmlEvent (elem) {
-    let data = this.parseXmlEvent(elem)
-    if (data) data = cleanObject(data)
-    if (data) this.player.emit(this.name, data)
+  // Event process
+  //
+  // <name>:xml           - raised on the player with a Parsley element
+  //                        of the raw XML element captured
+  //
+  // parseXmlElement      - called to turn the raw element into an object
+  //                        the default implementation converts any purely
+  //                        text elements, and also looks into the LastChange
+  //                        if given.
+  //
+  // <name>:data          - this data is then emitted for any listeners
+  //
+  // parseEvent           - called to extract / convert the string data
+  //
+  // <name>               - emitted once all data converted
+  handleEvent (elem) {
+    this.player.emit(`${this.name}:xml`, elem)
+    const parsedData = this.parseXmlElement(elem)
+    this.player.emit(`${this.name}:data`, parsedData)
+    const eventData = cleanObject(this.parseEvent(parsedData))
+    if (eventData) this.player.emit(this.name, eventData)
   }
 
-  // default parser does nothing
-  parseXmlEvent () {}
+  parseXmlElement (msg) {
+    const out = parseElementTexts(msg)
+    if ('lastChange' in out) {
+      parseElementVals(Parsley.from(out.lastChange), out)
+    }
+    return out
+  }
 
   async callSOAP (method, parms, parse) {
     this.debug(method, parms)
@@ -79,7 +95,7 @@ export default class SonosService {
         /* c8 ignore end */
         const text = await response.text()
         const p = Parsley.from(text).find(`u:${method}Response`)
-        return parse ? parse(p) : p
+        return cleanObject(parseElementTexts(p))
         // defensive check: should never happen
         /* c8 ignore start */
       } catch (err) {
@@ -125,7 +141,6 @@ export default class SonosService {
     const listener = this.listener
 
     await listener.start()
-    if (this.systemWide && listener.hasService(this.name)) return
 
     const sub = (this.subscription = new Subscription(this))
     listener.registerPath(sub.path, sub)

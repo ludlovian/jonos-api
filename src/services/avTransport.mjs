@@ -32,40 +32,35 @@ export default class AVTransport extends SonosService {
 
   getPositionInfo () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetPositionInfo', parms).then(e => {
-      return {
-        trackNum: guess(e.find('Track')?.text),
-        trackUri: e.find('TrackURI')?.text,
-        trackMetadata: e.find('TrackMetaData')?.text,
-        trackPos: parseDuration(e.find('RelTime')?.text),
-        trackDuration: parseDuration(e.find('TrackDuration')?.text)
-      }
-    })
+    return this.callSOAP('GetPositionInfo', parms).then(d => ({
+      trackNum: guess(d.track),
+      trackUri: d.trackUri,
+      trackMetadata: d.trackMetaData,
+      trackPos: parseDuration(d.relTime),
+      trackDuration: parseDuration(d.trackDuration)
+    }))
   }
 
   getMediaInfo () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetMediaInfo', parms).then(e => ({
-      mediaUri: e.find('CurrentURI')?.text,
-      mediaMetadata: e.find('CurrentURIMetaData')?.text
+    return this.callSOAP('GetMediaInfo', parms).then(d => ({
+      mediaUri: d.currentUri,
+      mediaMetadata: d.currentUriMetaData
     }))
   }
 
   getTransportInfo () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetTransportInfo', parms).then(e => {
-      const playState = e.find('CurrentTransportState')?.text
-      return {
-        playState,
-        ...parsePlayState(playState)
-      }
-    })
+    return this.callSOAP('GetTransportInfo', parms).then(d => ({
+      playState: d.currentTransportState,
+      ...parsePlayState(d.currentTransportState)
+    }))
   }
 
   getPlayMode () {
     const parms = { InstanceID: 0 }
-    return this.callSOAP('GetTransportSettings', parms).then(e => ({
-      playMode: e.find('PlayMode')?.text
+    return this.callSOAP('GetTransportSettings', parms).then(d => ({
+      playMode: d.playMode
     }))
   }
 
@@ -144,20 +139,14 @@ export default class AVTransport extends SonosService {
   // ---------------------------------------------
   // Event parsing
 
-  parseXmlEvent (elem) {
-    const playState = elem.find('TransportState')?.attr?.val
-
+  parseEvent (data) {
     return {
-      playState,
-      ...parsePlayState(playState),
-
-      trackUri: elem.find('CurrentTrackURI')?.attr?.val,
-      trackMetadata: elem.find('CurrentTrackMetaData')?.attr?.val,
-      trackDuration: parseDuration(
-        elem.find('CurrentTrackDuration')?.attr?.val
-      ),
-
-      playMode: elem.find('CurrentPlayMode')?.attr?.val
+      playState: data.transportState,
+      ...parsePlayState(data.transportState),
+      trackUri: data.currentTrackUri,
+      trackMetadata: data.currentTrackMetaData,
+      trackDuration: parseDuration(data.currentTrackDuration),
+      playMode: data.currentPlayMode
     }
   }
 }

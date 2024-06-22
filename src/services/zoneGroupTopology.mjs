@@ -1,22 +1,19 @@
 import SonosService from './service.mjs'
-import { parseZoneGroupTopology } from '../parsers.mjs'
+import { parseZoneGroupState } from '../parsers.mjs'
 
 export default class ZoneGroupTopology extends SonosService {
   static name = 'ZoneGroupTopology'
   static path = 'ZoneGroupTopology'
 
-  // this is a system wide service
-  static systemWide = true
-
   static commands = ['getZoneGroupState']
 
   getZoneGroupState () {
-    return this.callSOAP('GetZoneGroupState', {}).then(p =>
-      parseZoneGroupTopology(p)
+    return this.callSOAP('GetZoneGroupState', {}).then(d =>
+      parseZoneGroupState(d.zoneGroupState)
     )
   }
 
-  parseXmlEvent (elem) {
-    return parseZoneGroupTopology(elem)
+  parseEvent ({ zoneGroupState }) {
+    if (zoneGroupState) return parseZoneGroupState(zoneGroupState)
   }
 }

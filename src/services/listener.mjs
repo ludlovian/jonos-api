@@ -36,10 +36,6 @@ export default class Listener {
     return this.#url
   }
 
-  hasService (serviceName) {
-    return this.#allSubs.some(sub => sub.service.name === serviceName)
-  }
-
   start () {
     return this.#startStopLock.exec(async () => {
       if (this.#started) return false

@@ -25,13 +25,13 @@ importers:
         version: https://codeload.github.com/ludlovian/lock/tar.gz/d1ca32b46e1e59cb8d7736f64a438dabc570555c
       '@ludlovian/parsley':
         specifier: github:ludlovian/parsley
-        version: https://codeload.github.com/ludlovian/parsley/tar.gz/f0d2f3be2ea1c9f560113f62a64b876976fbb460
+        version: https://codeload.github.com/ludlovian/parsley/tar.gz/842e5757154856c9d543fbd1f537c621194b7e1c
       '@ludlovian/timeout':
         specifier: github:ludlovian/timeout
         version: https://codeload.github.com/ludlovian/timeout/tar.gz/bb8ad7cf5e35442c41409be15c8658bafb2b3ada
       '@ludlovian/timer':
         specifier: github:ludlovian/timer
-        version: https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f
+        version: https://codeload.github.com/ludlovian/timer/tar.gz/fa5cf51fba00f2715de2b182d1d546d7a8cbe883
       '@lukeed/ms':
         specifier: ^2.0.2
         version: 2.0.2
@@ -58,17 +58,17 @@ packages:
     resolution: {tarball: https://codeload.github.com/ludlovian/lock/tar.gz/d1ca32b46e1e59cb8d7736f64a438dabc570555c}
     version: 0.1.0
 
-  '@ludlovian/parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/f0d2f3be2ea1c9f560113f62a64b876976fbb460':
-    resolution: {tarball: https://codeload.github.com/ludlovian/parsley/tar.gz/f0d2f3be2ea1c9f560113f62a64b876976fbb460}
-    version: 2.0.0
+  '@ludlovian/parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/842e5757154856c9d543fbd1f537c621194b7e1c':
+    resolution: {tarball: https://codeload.github.com/ludlovian/parsley/tar.gz/842e5757154856c9d543fbd1f537c621194b7e1c}
+    version: 2.0.2
 
   '@ludlovian/timeout@https://codeload.github.com/ludlovian/timeout/tar.gz/bb8ad7cf5e35442c41409be15c8658bafb2b3ada':
     resolution: {tarball: https://codeload.github.com/ludlovian/timeout/tar.gz/bb8ad7cf5e35442c41409be15c8658bafb2b3ada}
     version: 0.1.0
 
-  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f':
-    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f}
-    version: 3.0.0
+  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/fa5cf51fba00f2715de2b182d1d546d7a8cbe883':
+    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/fa5cf51fba00f2715de2b182d1d546d7a8cbe883}
+    version: 3.0.2
 
   '@lukeed/ms@2.0.2':
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
@@ -90,10 +90,10 @@ snapshots:
 
   '@ludlovian/lock@https://codeload.github.com/ludlovian/lock/tar.gz/d1ca32b46e1e59cb8d7736f64a438dabc570555c': {}
 
-  '@ludlovian/parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/f0d2f3be2ea1c9f560113f62a64b876976fbb460': {}
+  '@ludlovian/parsley@https://codeload.github.com/ludlovian/parsley/tar.gz/842e5757154856c9d543fbd1f537c621194b7e1c': {}
 
   '@ludlovian/timeout@https://codeload.github.com/ludlovian/timeout/tar.gz/bb8ad7cf5e35442c41409be15c8658bafb2b3ada': {}
 
-  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f': {}
+  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/fa5cf51fba00f2715de2b182d1d546d7a8cbe883': {}
 
   '@lukeed/ms@2.0.2': {}

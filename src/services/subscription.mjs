@@ -109,18 +109,12 @@ export default class Subscription {
     /* c8 ignore end */
 
     const name = this.service.name
-    const xmlName = name + ':xml'
     this.debug('%s event received', name)
 
-    // emit the complete element
+    // parse the XML (failing noisily if it is badly formed)
     const elem = Parsley.from(req.body)
-    this.player.emit(xmlName, elem)
 
-    // emit the lastChange if given
-    const lastChange = elem.find('LastChange')
-    if (lastChange && lastChange.isText) {
-      const elem = Parsley.from(lastChange.text)
-      this.player.emit(xmlName, elem)
-    }
+    // and hand to the service to process
+    this.service.handleEvent(elem)
   }
 }

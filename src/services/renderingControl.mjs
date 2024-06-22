@@ -10,15 +10,15 @@ export default class RenderingControl extends SonosService {
 
   getVolume () {
     const parms = { InstanceID: 0, Channel: 'Master' }
-    return this.callSOAP('GetVolume', parms).then(p => ({
-      volume: guess(p.get('CurrentVolume')?.text)
+    return this.callSOAP('GetVolume', parms).then(d => ({
+      volume: guess(d.currentVolume)
     }))
   }
 
   getMute () {
     const parms = { InstanceID: 0, Channel: 'Master' }
-    return this.callSOAP('GetMute', parms).then(p => ({
-      mute: guess(p.get('CurrentMute')?.text, { bool: true })
+    return this.callSOAP('GetMute', parms).then(d => ({
+      mute: guess(d.currentMute, { bool: true })
     }))
   }
 
@@ -33,14 +33,10 @@ export default class RenderingControl extends SonosService {
     await this.callSOAP('SetMute', parms)
   }
 
-  parseXmlEvent (e) {
+  parseEvent (data) {
     return {
-      volume: guess(e.find(master('Volume'))?.attr?.val),
-      mute: guess(e.find(master('Mute'))?.attr?.val, { bool: true })
+      volume: guess(data['volume:Master']),
+      mute: guess(data['mute:Master'], { bool: true })
     }
   }
-}
-
-function master (type) {
-  return e => e.type === type && e.attr.channel === 'Master'
 }

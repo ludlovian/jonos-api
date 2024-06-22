@@ -7,13 +7,9 @@ export function parsePlayState (playState) {
   }
 }
 
-export function parseZoneGroupTopology (p) {
-  p = p.find('ZoneGroupState')
-  if (!p) return undefined
-
-  // embedded XML
-  if (p.isText) p = Parsley.from(p.text)
-
+export function parseZoneGroupState (zgs) {
+  if (!zgs) return undefined
+  const p = Parsley.from(zgs)
   const players = []
 
   for (const zg of p.findAll('ZoneGroup')) {
@@ -33,11 +29,10 @@ export function parseZoneGroupTopology (p) {
   return { players }
 }
 
-export function parseQueue (elem) {
-  const text = elem.find('Result')?.text?.trim()
-  if (!text) return undefined
+export function parseQueue ({ result }) {
+  if (!result) return undefined
 
-  elem = Parsley.from(text)
+  const elem = Parsley.from(result)
   const queue = elem
     .findAll('item')
     .map(el => el.find('res')?.text)
