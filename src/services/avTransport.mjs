@@ -34,7 +34,7 @@ export default class AVTransport extends SonosService {
     const parms = { InstanceID: 0 }
     return this.callSOAP('GetPositionInfo', parms).then(d => ({
       trackNum: guess(d.track),
-      trackUri: d.trackUri,
+      trackUrl: d.trackUri,
       trackMetadata: d.trackMetaData,
       trackPos: parseDuration(d.relTime),
       trackDuration: parseDuration(d.trackDuration)
@@ -143,7 +143,7 @@ export default class AVTransport extends SonosService {
     return {
       playState: data.transportState,
       ...parsePlayState(data.transportState),
-      trackUri: data.currentTrackUri,
+      trackUrl: data.currentTrackUri,
       trackMetadata: data.currentTrackMetaData,
       trackDuration: parseDuration(data.currentTrackDuration),
       playMode: data.currentPlayMode

@@ -62,7 +62,7 @@ suite('AVTransport', () => {
 
     const res = await player.getPositionInfo()
     assert.strictEqual(res.trackNum, trackNum)
-    assert.strictEqual(res.trackUri, tracks[1])
+    assert.strictEqual(res.trackUrl, tracks[1])
     assert.strictEqual(res.trackPos, trackPos)
   })
 
