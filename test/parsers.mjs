@@ -64,7 +64,7 @@ suite('parsers', { concurrency: false }, () => {
             url: 'http://url1/',
             uuid: 'uuid1',
             fullName: 'name1',
-            leaderUuid: ''
+            leaderUuid: 'uuid1'
           },
           {
             url: 'http://url2/',

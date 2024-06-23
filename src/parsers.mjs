@@ -22,7 +22,7 @@ export function parseZoneGroupState (zgs) {
         uuid: zgm.attr.UUID,
         fullName: zgm.attr.ZoneName
       }
-      player.leaderUuid = ldrUuid === player.uuid ? '' : ldrUuid
+      player.leaderUuid = ldrUuid
       players.push(player)
     }
   }
