@@ -1,13 +1,13 @@
 import configure from '@ludlovian/configure'
 
-export default configure('JONOS_', {
-  apiCallRetryCount: 1,
-  apiCallRetryDelay: '2s',
+export default configure('JONOS_API_', {
+  callRetryCount: 2,
+  callRetryDelay: '2s',
 
-  apiCallTimeout: '5s',
+  callTimeout: '5s',
 
-  apiSubscriptionTimeout: 'Second-1800',
-  apiSubscriptionRenew: '25m',
+  subscriptionTimeout: 'Second-1800',
+  subscriptionRenew: '25m',
 
-  apiDiscoveryTimeout: '3s'
+  discoveryTimeout: '3s'
 })

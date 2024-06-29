@@ -84,7 +84,7 @@ export default class SonosService {
 
     let caughtErr
 
-    for (let i = 0; i < config.apiCallRetryCount; i++) {
+    for (let i = 0; i < config.callRetryCount; i++) {
       try {
         const response = await this.#player.exec(fn)
         // defensive check: should never happen
@@ -104,7 +104,7 @@ export default class SonosService {
         this.#player.emit('error', err)
       }
       /* c8 ignore end */
-      await sleep(config.apiCallRetryDelay)
+      await sleep(config.callRetryDelay)
     }
     if (caughtErr) throw caughtErr
   }

@@ -27,7 +27,7 @@ export default class Player extends EventEmitter {
   static async discover () {
     const url = await timeout(
       Player.#discovery.discoverOne(),
-      config.apiDiscoveryTimeout
+      config.discoveryTimeout
     )
 
     const p = new Player(url)
@@ -81,7 +81,7 @@ export default class Player extends EventEmitter {
   }
 
   exec (fn) {
-    return this.#lock.exec(timeout(fn, config.apiCallTimeout))
+    return this.#lock.exec(timeout(fn, config.callTimeout))
   }
 
   async getDescription () {

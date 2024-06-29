@@ -53,7 +53,7 @@ export default class Subscription {
     const headers = {
       callback: `<${this.url.href}>`,
       NT: 'upnp:event',
-      Timeout: config.apiSubscriptionTimeout
+      Timeout: config.subscriptionTimeout
     }
 
     const method = 'SUBSCRIBE'
@@ -65,7 +65,7 @@ export default class Subscription {
     this.debug('%s subscribed', this.service.name)
 
     this.#tmRenew = new Timer({
-      ms: config.apiSubscriptionRenew,
+      ms: config.subscriptionRenew,
       fn: () => this.renew().catch(forwardErr)
     })
   }
@@ -75,7 +75,7 @@ export default class Subscription {
   async renew () {
     const headers = {
       sid: this.#sid,
-      Timeout: config.apiSubscriptionTimeout
+      Timeout: config.subscriptionTimeout
     }
     const method = 'SUBSCRIBE'
     const fn = () => fetch(this.endpoint, { method, headers })

@@ -53,7 +53,7 @@ export default class Listener {
         })
       })
 
-      await timeout(pStart, config.apiCallTimeout)
+      await timeout(pStart, config.callTimeout)
 
       this.#started = true
       return true
@@ -85,7 +85,7 @@ export default class Listener {
         })
       })
 
-      await timeout(pStop, config.apiCallTimeout)
+      await timeout(pStop, config.callTimeout)
 
       this.#started = false
       this.#debug('Listener stopped')
