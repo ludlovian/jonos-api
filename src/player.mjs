@@ -2,11 +2,9 @@ import util from 'node:util'
 import { EventEmitter } from 'node:events'
 
 import Parsley from '@ludlovian/parsley'
-import timeout from '@ludlovian/timeout'
 import Debug from '@ludlovian/debug'
 import Lock from '@ludlovian/lock'
 
-import config from './config.mjs'
 import AVTransport from './services/avTransport.mjs'
 import RenderingControl from './services/renderingControl.mjs'
 import ZoneGroupTopology from './services/zoneGroupTopology.mjs'
@@ -25,10 +23,7 @@ export default class Player extends EventEmitter {
   #services
 
   static async discover () {
-    const url = await timeout(
-      Player.#discovery.discoverOne(),
-      config.discoveryTimeout
-    )
+    const url = await Player.#discovery.discoverOne()
 
     const p = new Player(url)
     return p.getZoneGroupState()
@@ -81,7 +76,7 @@ export default class Player extends EventEmitter {
   }
 
   exec (fn) {
-    return this.#lock.exec(timeout(fn, config.callTimeout))
+    return this.#lock.exec(fn)
   }
 
   async getDescription () {

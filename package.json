@@ -23,7 +23,6 @@
     "@ludlovian/guess": "github:ludlovian/guess",
     "@ludlovian/lock": "github:ludlovian/lock",
     "@ludlovian/parsley": "github:ludlovian/parsley",
-    "@ludlovian/timeout": "github:ludlovian/timeout",
     "@ludlovian/timer": "github:ludlovian/timer",
     "@lukeed/ms": "^2.0.2"
   }

@@ -1,11 +1,8 @@
 import { createServer } from 'node:http'
 import { networkInterfaces } from 'node:os'
 
-import timeout from '@ludlovian/timeout'
 import Debug from '@ludlovian/debug'
 import Lock from '@ludlovian/lock'
-
-import config from '../config.mjs'
 
 const { values } = Object
 
@@ -43,7 +40,7 @@ export default class Listener {
 
       this.#server = createServer(this.handleRequest.bind(this))
 
-      const pStart = new Promise((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         this.#server.once('error', reject)
         this.#server.listen(0, address, () => {
           const { address, port } = this.#server.address()
@@ -52,8 +49,6 @@ export default class Listener {
           resolve()
         })
       })
-
-      await timeout(pStart, config.callTimeout)
 
       this.#started = true
       return true
@@ -78,14 +73,12 @@ export default class Listener {
       }
       /* c8 ignore end */
 
-      const pStop = new Promise((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         this.#server.close(err => {
           if (err) return reject(err)
           resolve()
         })
       })
-
-      await timeout(pStop, config.callTimeout)
 
       this.#started = false
       this.#debug('Listener stopped')
